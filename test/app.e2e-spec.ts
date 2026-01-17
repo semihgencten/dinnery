@@ -24,7 +24,7 @@ describe('AppController (e2e)', () => {
       .expect('Hello World!');
   });
 
-  it('/ (POST)', () => {
+  it('/recipes (POST)', () => {
     const recipe: CreateRecipeDto = {
       name: "soup",
       instructions: "call the restaurant"
@@ -32,7 +32,6 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .post('/recipes')
       .send(recipe)
-      .expect(201)
-      .expect('Hello World!');
+      .expect(201);
   });
 });
