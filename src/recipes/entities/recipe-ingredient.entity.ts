@@ -17,7 +17,7 @@ export class RecipeIngredientEntity extends BaseEntity {
     @Column({ length: 50 })
     unit: string;
 
-    @Column({ name: 'custom_ingredient_text', nullable: true, length: 255 })
+    @Column({ name: 'custom_ingredient_text', type: 'varchar', length: 255, nullable: true })
     customIngredientText: string | null;
 
     @Column({ nullable: true, type: 'text' })

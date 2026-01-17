@@ -33,6 +33,10 @@ export class CreateRecipeDto {
     @IsString()
     description?: string;
 
+    @IsOptional()
+    @IsString()
+    category?: string;
+
     @IsString()
     @IsNotEmpty()
     instructions: string;
@@ -51,6 +55,7 @@ export class RecipeResponseDto {
     id: number;
     name: string;
     description: string | null;
+    category: string | null;
     instructions: string;
     photoUrl: string | null;
     createdAt: Date;

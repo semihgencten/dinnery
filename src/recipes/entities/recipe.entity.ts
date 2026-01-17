@@ -10,6 +10,9 @@ export class RecipeEntity extends BaseEntity {
     @Column({ nullable: true, type: 'text' })
     description: string;
 
+    @Column({ nullable: true, length: 50 })
+    category: string;
+
     @Column({ type: 'text' })
     instructions: string;
 

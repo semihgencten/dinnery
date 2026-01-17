@@ -7,6 +7,7 @@ export class RecipeMapper {
             entity.id,
             entity.name,
             entity.description,
+            entity.category,
             entity.instructions,
             entity.photoUrl,
             entity.createdAt,
@@ -18,6 +19,7 @@ export class RecipeMapper {
         return {
             name: domain.name,
             description: domain.description ?? undefined,
+            category: domain.category ?? undefined,
             instructions: domain.instructions,
             photoUrl: domain.photoUrl ?? undefined
         };

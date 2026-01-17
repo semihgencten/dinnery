@@ -30,6 +30,7 @@ export class RecipesService {
     const domainData = Recipe.create(
       createDto.name,
       createDto.description ?? '',
+      createDto.category,
       createDto.instructions,
       createDto.photoUrl,
     );
