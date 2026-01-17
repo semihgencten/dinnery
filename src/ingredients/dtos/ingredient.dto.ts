@@ -1,7 +1,20 @@
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+
 export class CreateIngredientDto {
+    @IsString()
+    @IsNotEmpty()
     name: string;
+
+    @IsString()
+    @IsNotEmpty()
     displayName: string;
+
+    @IsOptional()
+    @IsString()
     photoUrl?: string;
+
+    @IsOptional()
+    @IsString()
     category?: string;
 }
 

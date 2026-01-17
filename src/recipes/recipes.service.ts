@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RecipeEntity } from './entities/recipe.entity';
+import { RecipeIngredientEntity } from './entities/recipe-ingredient.entity';
 import { Recipe } from './domain/recipe.model';
 import { RecipeMapper } from './mappers/recipe.mapper';
 import { CreateRecipeDto } from './dtos/recipe.dto';
@@ -42,6 +43,20 @@ export class RecipesService {
     }
 
     const entityData = RecipeMapper.toEntity(domainData);
+
+    // Map ingredients if they exist
+    if (createDto.ingredients?.length) {
+      entityData.ingredients = createDto.ingredients.map(dto => {
+        const ingredient = new RecipeIngredientEntity();
+        ingredient.ingredientId = dto.ingredientId ?? null;
+        ingredient.quantity = dto.quantity;
+        ingredient.unit = dto.unit;
+        ingredient.customIngredientText = dto.customIngredientText ?? null;
+        ingredient.notes = dto.notes ?? null;
+        return ingredient;
+      });
+    }
+
     const entity = await this.recipeRepo.save(entityData);
 
     return RecipeMapper.toDomain(entity);
