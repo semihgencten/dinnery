@@ -6,6 +6,7 @@ export class Recipe {
         public readonly category: string | null,
         public readonly instructions: string,
         public readonly photoUrl: string | null,
+        public readonly originalRecipeId: number | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
     ) { }
@@ -15,14 +16,16 @@ export class Recipe {
         description: string,
         category: string | undefined,
         instructions: string,
-        photoUrl?: string
+        photoUrl?: string,
+        originalRecipeId?: number
     ): Partial<Recipe> {
         return {
             name: name.trim(),
             description: description?.trim() || null,
             category: category?.trim() || null,
             instructions: instructions.trim(),
-            photoUrl: photoUrl || null
+            photoUrl: photoUrl || null,
+            originalRecipeId: originalRecipeId || null
         };
     }
 }

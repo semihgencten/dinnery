@@ -33,6 +33,7 @@ export class RecipesService {
       createDto.category,
       createDto.instructions,
       createDto.photoUrl,
+      createDto.originalRecipeId,
     );
 
     const existing = await this.recipeRepo.findOne({

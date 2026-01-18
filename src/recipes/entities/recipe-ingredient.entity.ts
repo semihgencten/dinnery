@@ -31,3 +31,5 @@ export class RecipeIngredientEntity extends BaseEntity {
     @JoinColumn({ name: 'ingredient_id' })
     ingredient: IngredientEntity | null;
 }
+//user has many recipes
+//recipe has 

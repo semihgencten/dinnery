@@ -10,6 +10,7 @@ export class RecipeMapper {
             entity.category,
             entity.instructions,
             entity.photoUrl,
+            entity.originalRecipeId || null,
             entity.createdAt,
             entity.updatedAt
         );
@@ -21,7 +22,8 @@ export class RecipeMapper {
             description: domain.description ?? undefined,
             category: domain.category ?? undefined,
             instructions: domain.instructions,
-            photoUrl: domain.photoUrl ?? undefined
+            photoUrl: domain.photoUrl ?? undefined,
+            originalRecipeId: domain.originalRecipeId ?? undefined
         };
     }
 

@@ -45,6 +45,10 @@ export class CreateRecipeDto {
     @IsString()
     photoUrl?: string;
 
+    @IsOptional()
+    @IsNumber()
+    originalRecipeId?: number;
+
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateRecipeIngredientDto)
@@ -58,6 +62,7 @@ export class RecipeResponseDto {
     category: string | null;
     instructions: string;
     photoUrl: string | null;
+    originalRecipeId: number | null;
     createdAt: Date;
     updatedAt: Date;
 }

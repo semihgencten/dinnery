@@ -1,5 +1,6 @@
-import { Entity, Column, OneToMany } from 'typeorm';
+import { Entity, Column, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { RecipeIngredientEntity } from './recipe-ingredient.entity';
+import { UserRecipeEntity } from './user-recipe.entity';
 import { BaseEntity } from '../../common/entities/base.entity';
 
 @Entity('recipes')
@@ -23,4 +24,16 @@ export class RecipeEntity extends BaseEntity {
         cascade: true
     })
     ingredients: RecipeIngredientEntity[];
+
+    @Column({ name: 'original_recipe_id', nullable: true })
+    originalRecipeId: number;
+
+    @ManyToOne(() => RecipeEntity, { nullable: true })
+    @JoinColumn({ name: 'original_recipe_id' })
+    originalRecipe: RecipeEntity;
+
+    @OneToMany(() => UserRecipeEntity, (userRecipe) => userRecipe.recipe, {
+        cascade: true
+    })
+    userRecipes: UserRecipeEntity[];
 }
