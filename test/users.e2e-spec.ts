@@ -26,6 +26,7 @@ describe('UsersController (e2e)', () => {
                 name: 'Test User',
                 username: uniqueUsername,
                 email: uniqueEmail,
+                password: 'password123',
                 country: 'TestLand',
                 avatar: 'http://example.com/avatar.jpg'
             })
@@ -47,6 +48,7 @@ describe('UsersController (e2e)', () => {
                 name: 'List User',
                 username: uniqueUsername,
                 email: uniqueEmail,
+                password: 'password123',
                 country: 'ListLand'
             })
             .expect(201);
@@ -72,6 +74,7 @@ describe('UsersController (e2e)', () => {
                 name: 'Single User',
                 username: uniqueUsername,
                 email: uniqueEmail,
+                password: 'password123',
                 country: 'SingleLand'
             })
             .expect(201);

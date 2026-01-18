@@ -13,6 +13,9 @@ export class UserEntity extends BaseEntity {
     @Column({ unique: true, length: 150 })
     email: string;
 
+    @Column({ length: 255 })
+    password: string;
+
     @Column({ length: 100 })
     country: string;
 

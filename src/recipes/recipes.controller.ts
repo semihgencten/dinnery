@@ -3,13 +3,15 @@ import { RecipesService } from './recipes.service';
 import { Recipe } from './domain/recipe.model';
 import { CreateRecipeDto } from './dtos/recipe.dto';
 import { UserRecipeRole } from './domain/user-recipe.model';
-
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('recipes')
 export class RecipesController {
   constructor(private recipesService: RecipesService) { }
 
   @Post()
+  @UseGuards(AuthGuard)
   async create(@Body() createRecipeDto: CreateRecipeDto): Promise<Recipe> {
     return this.recipesService.create(createRecipeDto);
   }

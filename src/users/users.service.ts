@@ -25,6 +25,16 @@ export class UsersService {
         return UserMapper.toDomain(entity);
     }
 
+    async findByEmail(email: string): Promise<User | null> {
+        const entity = await this.userRepo.findOne({
+            where: { email }
+        });
+
+        if (!entity) return null;
+
+        return UserMapper.toDomain(entity);
+    }
+
     async create(createDto: CreateUserDto): Promise<User> {
         // Check for existing username or email
         const existing = await this.userRepo.findOne({
@@ -42,6 +52,7 @@ export class UsersService {
             name: createDto.name,
             username: createDto.username,
             email: createDto.email,
+            password: createDto.password,
             country: createDto.country,
             avatar: createDto.avatar
         });

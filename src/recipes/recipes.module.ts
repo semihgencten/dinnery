@@ -7,9 +7,10 @@ import { RecipeEntity } from './entities/recipe.entity';
 import { RecipeIngredientEntity } from './entities/recipe-ingredient.entity';
 
 import { UserRecipeEntity } from './entities/user-recipe.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RecipeEntity, RecipeIngredientEntity, UserRecipeEntity])],
+  imports: [AuthModule, TypeOrmModule.forFeature([RecipeEntity, RecipeIngredientEntity, UserRecipeEntity])],
   providers: [RecipesService],
   controllers: [RecipesController],
   exports: [RecipesService]
