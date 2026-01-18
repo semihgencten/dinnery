@@ -74,6 +74,37 @@ describe('RecipesController (e2e)', () => {
             });
     });
 
+    it('/recipes/search (GET) - filter by name and category', async () => {
+        // Create recipes
+        await request(app.getHttpServer()).post('/recipes').send({
+            name: 'Chicken Soup',
+            instructions: 'Cook chicken.',
+            category: 'Soup',
+            ingredients: [{ quantity: 1, unit: 'bowl', customIngredientText: 'Chicken' }]
+        });
+        await request(app.getHttpServer()).post('/recipes').send({
+            name: 'Tomato Soup',
+            instructions: 'Cook tomato.',
+            category: 'Soup',
+            ingredients: [{ quantity: 1, unit: 'bowl', customIngredientText: 'Tomato' }]
+        });
+        await request(app.getHttpServer()).post('/recipes').send({
+            name: 'Chicken Salad',
+            instructions: 'Mix.',
+            category: 'Salad',
+            ingredients: [{ quantity: 1, unit: 'bowl', customIngredientText: 'Chicken' }]
+        });
+
+        // Search for 'Chicken' with category 'Soup'
+        return request(app.getHttpServer())
+            .get('/recipes/search?name=Chicken&category=Soup')
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.length).toBe(1);
+                expect(res.body[0].name).toBe('Chicken Soup');
+            });
+    });
+
     afterAll(async () => {
         await app.close();
     });

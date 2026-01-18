@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { RecipeEntity } from './entities/recipe.entity';
 import { RecipeIngredientEntity } from './entities/recipe-ingredient.entity';
 import { Recipe } from './domain/recipe.model';
 import { RecipeMapper } from './mappers/recipe.mapper';
 import { CreateRecipeDto } from './dtos/recipe.dto';
 import { UserRecipeEntity } from './entities/user-recipe.entity';
+import { UserRecipeRole } from './domain/user-recipe.model';
 
 @Injectable()
 export class RecipesService {
@@ -77,5 +78,24 @@ export class RecipesService {
   async findAll(): Promise<Recipe[]> {
     const entities = await this.recipeRepo.find();
     return RecipeMapper.toDomainList(entities);
+  }
+  async findByUserAndRole(userId: number, role: UserRecipeRole): Promise<Recipe[]> {
+    return this.recipeRepo.find({
+      where: { userRecipes: { userId, role } },
+    });
+  }
+
+  async search(name?: string, category?: string): Promise<Recipe[]> {
+    const where: any = {};
+
+    if (name) {
+      where.name = Like(`%${name}%`);
+    }
+
+    if (category) {
+      where.category = category;
+    }
+
+    return this.recipeRepo.find({ where });
   }
 }

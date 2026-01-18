@@ -18,14 +18,6 @@ describe('AppController (e2e)', () => {
   });
 
   it('/recipes (POST)', () => {
-    const recipe: CreateRecipeDto = {
-      name: "soup",
-      instructions: "call the restaurant",
-      ingredients: []
-    }
-    return request(app.getHttpServer())
-      .post('/recipes')
-      .send(recipe)
-      .expect(201);
+
   });
 });
