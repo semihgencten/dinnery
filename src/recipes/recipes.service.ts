@@ -6,6 +6,7 @@ import { RecipeIngredientEntity } from './entities/recipe-ingredient.entity';
 import { Recipe } from './domain/recipe.model';
 import { RecipeMapper } from './mappers/recipe.mapper';
 import { CreateRecipeDto } from './dtos/recipe.dto';
+import { UserRecipeEntity } from './entities/user-recipe.entity';
 
 @Injectable()
 export class RecipesService {
@@ -56,6 +57,15 @@ export class RecipesService {
         ingredient.customIngredientText = dto.customIngredientText ?? null;
         ingredient.notes = dto.notes ?? null;
         return ingredient;
+      });
+    }
+
+    if (createDto.userRecipes?.length) {
+      entityData.userRecipes = createDto.userRecipes.map(dto => {
+        const userRecipe = new UserRecipeEntity();
+        userRecipe.userId = dto.userId;
+        userRecipe.role = dto.role;
+        return userRecipe;
       });
     }
 

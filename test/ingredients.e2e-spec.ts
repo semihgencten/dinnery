@@ -48,6 +48,27 @@ describe('IngredientsController (e2e)', () => {
             });
     });
 
+
+    it('/ingredients/search (GET)', async () => {
+        await request(app.getHttpServer())
+            .post('/ingredients')
+            .send({
+                name: 'Garlic',
+                displayName: 'Garlic',
+            })
+            .expect(201);
+
+        return request(app.getHttpServer())
+            .get('/ingredients/search?term=garlic')
+            .expect(200)
+            .expect((res) => {
+                expect(Array.isArray(res.body)).toBe(true);
+                expect(res.body.length).toBeGreaterThan(0);
+                const found = res.body.find((item: any) => item.name === 'garlic');
+                expect(found).toBeDefined();
+            });
+    });
+
     afterAll(async () => {
         await app.close();
     });

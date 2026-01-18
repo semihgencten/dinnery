@@ -1,5 +1,6 @@
-import { IsString, IsOptional, IsNumber, IsArray, ValidateNested, ValidateIf, IsNotEmpty, Min } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsArray, ValidateNested, ValidateIf, IsNotEmpty, Min, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
+import { UserRecipeRole } from '../domain/user-recipe.model';
 
 export class CreateRecipeIngredientDto {
     @ValidateIf(o => !o.customIngredientText)
@@ -22,6 +23,14 @@ export class CreateRecipeIngredientDto {
     @IsOptional()
     @IsString()
     notes?: string;
+}
+
+export class UserRecipeDto {
+    @IsNumber()
+    userId: number;
+
+    @IsEnum(UserRecipeRole)
+    role: UserRecipeRole;
 }
 
 export class CreateRecipeDto {
@@ -53,6 +62,11 @@ export class CreateRecipeDto {
     @ValidateNested({ each: true })
     @Type(() => CreateRecipeIngredientDto)
     ingredients: CreateRecipeIngredientDto[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UserRecipeDto)
+    userRecipes: UserRecipeDto[];
 }
 
 export class RecipeResponseDto {
