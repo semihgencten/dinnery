@@ -11,9 +11,10 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: 'dinnery.sqlite',
+      database: process.env.NODE_ENV === 'test' ? ':memory:' : 'dinnery.sqlite',
       autoLoadEntities: true,
       synchronize: true,
+      dropSchema: process.env.NODE_ENV === 'test',
     }),
     RecipesModule,
     IngredientsModule,

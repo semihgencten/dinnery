@@ -4,7 +4,7 @@ import { Recipe } from './domain/recipe.model';
 import { CreateRecipeDto } from './dtos/recipe.dto';
 import { UserRecipeRole } from './domain/user-recipe.model';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('recipes')
 export class RecipesController {

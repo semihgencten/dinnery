@@ -4,6 +4,7 @@ import { RecipesService } from './recipes.service';
 import { CreateRecipeDto } from './dtos/recipe.dto';
 import { Recipe } from './domain/recipe.model';
 import { UserRecipeRole } from './domain/user-recipe.model';
+import { AuthGuard } from '../auth/auth.guard';
 
 describe('RecipesController', () => {
   let controller: RecipesController;
@@ -36,7 +37,10 @@ describe('RecipesController', () => {
           },
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<RecipesController>(RecipesController);
     service = module.get<RecipesService>(RecipesService);
