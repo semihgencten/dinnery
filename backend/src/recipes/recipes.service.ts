@@ -98,4 +98,43 @@ export class RecipesService {
 
     return this.recipeRepo.find({ where });
   }
+
+  async fork(originalId: number, userId: number): Promise<Recipe> {
+    const original = await this.recipeRepo.findOne({
+      where: { id: originalId },
+      relations: ['ingredients'],
+    });
+
+    if (!original) {
+      throw new NotFoundException(`Recipe with ID ${originalId} not found`);
+    }
+
+    const newRecipe = new RecipeEntity();
+    newRecipe.name = `${original.name} (Fork)`;
+    newRecipe.description = original.description;
+    newRecipe.category = original.category;
+    newRecipe.instructions = original.instructions;
+    newRecipe.photoUrl = original.photoUrl;
+    newRecipe.originalRecipeId = original.id;
+
+    if (original.ingredients) {
+      newRecipe.ingredients = original.ingredients.map((ing) => {
+        const newIng = new RecipeIngredientEntity();
+        newIng.quantity = ing.quantity;
+        newIng.unit = ing.unit;
+        newIng.customIngredientText = ing.customIngredientText;
+        newIng.notes = ing.notes;
+        newIng.ingredientId = ing.ingredientId;
+        return newIng;
+      });
+    }
+
+    const userRecipe = new UserRecipeEntity();
+    userRecipe.userId = userId; // Assuming userId is passed from controller
+    userRecipe.role = UserRecipeRole.CREATOR;
+    newRecipe.userRecipes = [userRecipe];
+
+    const saved = await this.recipeRepo.save(newRecipe);
+    return RecipeMapper.toDomain(saved);
+  }
 }

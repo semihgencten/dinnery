@@ -18,8 +18,22 @@ describe('RecipesController (e2e)', () => {
         app = moduleFixture.createNestApplication();
         await app.init();
 
+        // Create a user for testing
+        const userResponse = await request(app.getHttpServer())
+            .post('/users')
+            .send({
+                name: 'Test User',
+                username: 'testuser',
+                email: 'test@example.com',
+                country: 'USA',
+                password: 'password123' // Assuming password is needed, based on previous context, or ignored if not in DTO yet
+            })
+            .expect(201);
+
+        const userId = userResponse.body.id;
+
         jwtService = app.get(JwtService);
-        token = jwtService.sign({ sub: 1, email: 'test@example.com' });
+        token = jwtService.sign({ sub: userId, email: 'test@example.com' });
     });
 
     it('/recipes (POST)', () => {
@@ -130,6 +144,34 @@ describe('RecipesController (e2e)', () => {
                 const found = res.body.find(r => r.name === 'Chicken Soup');
                 expect(found).toBeDefined();
                 expect(found.category).toBe('Soup');
+            });
+    });
+
+    it('/recipes/:id/fork (POST) - should fork an existing recipe', async () => {
+        // 1. Create a recipe to fork
+        const createResponse = await request(app.getHttpServer())
+            .post('/recipes')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: 'Original Recipe',
+                instructions: 'Original instructions',
+                description: 'Original description',
+                ingredients: [{ quantity: 1, unit: 'pc', customIngredientText: 'Item' }]
+            })
+            .expect(201);
+
+        const originalRecipeId = createResponse.body.id;
+
+        // 2. Fork the recipe
+        return request(app.getHttpServer())
+            .post(`/recipes/${originalRecipeId}/fork`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(201)
+            .expect((res) => {
+                expect(res.body.id).toBeDefined();
+                expect(res.body.id).not.toBe(originalRecipeId);
+                expect(res.body.name).toContain('Original Recipe'); // Or however we decide to name forks
+                expect(res.body.originalRecipeId).toBe(originalRecipeId);
             });
     });
 
