@@ -97,11 +97,12 @@ export class RecipesService {
   }
 
   async findAll(offset: number = 0, limit: number = 20): Promise<Recipe[]> {
-    const entities = await this.recipeRepo.find({
-      skip: offset,
-      take: limit,
-      order: { createdAt: 'DESC' }
-    });
+    const entities = await this.recipeRepo.createQueryBuilder('recipe')
+      .skip(offset)
+      .take(limit)
+      .orderBy('recipe.likesCount + recipe.commentsCount', 'DESC')
+      .addOrderBy('recipe.createdAt', 'DESC')
+      .getMany();
     return RecipeMapper.toDomainList(entities);
   }
   async findByUserAndRole(userId: number, role: UserRecipeRole): Promise<Recipe[]> {
@@ -111,17 +112,97 @@ export class RecipesService {
   }
 
   async search(name?: string, category?: string): Promise<Recipe[]> {
-    const where: any = {};
+    const qb = this.recipeRepo.createQueryBuilder('recipe');
 
     if (name) {
-      where.name = Like(`%${name}%`);
+      qb.andWhere('recipe.name LIKE :name', { name: `%${name}%` });
     }
 
     if (category) {
-      where.category = category;
+      qb.andWhere('recipe.category = :category', { category });
     }
 
-    return this.recipeRepo.find({ where });
+    qb.orderBy('recipe.likesCount + recipe.commentsCount', 'DESC');
+
+    const entities = await qb.getMany();
+    return RecipeMapper.toDomainList(entities);
+  }
+
+  async searchByIngredients(ingredients: string[]): Promise<Recipe[]> {
+    if (!ingredients || ingredients.length === 0) {
+      return [];
+    }
+
+    const ingredientsLower = ingredients.map(i => i.toLowerCase());
+
+    // 1. Find recipes that contain ingredients NOT in the list (The "Bad" recipes)
+    // We check customIngredientText. If ingredientId exists, we ideally check the name too, 
+    // but for now we assume customIngredientText covers the search term or we fall back to it.
+    // To be robust, we'll join the ingredient table.
+
+    // Note: TypeORM might prefix columns. We use the aliases defined.
+    const badRecipes = await this.recipeRepo.createQueryBuilder('r')
+      .select('r.id')
+      .innerJoin('r.ingredients', 'ri')
+      .leftJoin('ri.ingredient', 'i')
+      .where(`(LOWER(ri.custom_ingredient_text) NOT IN (:...ingredients) OR ri.custom_ingredient_text IS NULL)`)
+      .andWhere(`(i.name IS NULL OR LOWER(i.name) NOT IN (:...ingredients))`)
+      // If custom text is null AND name is null (weird data), is it bad? 
+      // Technically if it's not in the list, it's bad.
+      // But the condition above is AND.
+      // We want: (IsBadCustom OR IsBadLink) ?
+      // No, we want: Verify IsValid.
+      // IsValid = (Custom IN list OR Name IN list).
+      // So IsBad = NOT (Custom IN list OR Name IN list)
+      // = (Custom NOT IN list AND Name NOT IN list).
+      .setParameter('ingredients', ingredientsLower)
+      .getRawMany();
+
+    const badRecipeIds = badRecipes.map(r => r.r_id);
+
+    // 2. Fetch all recipes that are NOT in the bad list
+    const qb = this.recipeRepo.createQueryBuilder('r')
+      .leftJoinAndSelect('r.ingredients', 'ri')
+      .leftJoinAndSelect('r.userRecipes', 'ur')
+      .leftJoinAndSelect('ri.ingredient', 'i');
+
+    if (badRecipeIds.length > 0) {
+      qb.where('r.id NOT IN (:...badRecipeIds)', { badRecipeIds });
+    }
+
+    // Ensure we don't return recipes with NO ingredients if that's not desired, 
+    // but mathematically they are subsets.
+    // "1. selected ingredients are included in the recipe" -> could imply Count > 0.
+    // Let's filter out empty recipes to be safe? 
+    // If user searches for 'tomato', they want food. Empty recipe is not food.
+    // But how to check empty ingredients in this query?
+    // We can join ingredients.
+    // If we use innerJoinAndSelect('r.ingredients'), we enforce at least one ingredient.
+    // But we used leftJoinAndSelect.
+
+    // Let's enforce at least one ingredient match?
+    // Actually, "1. selected ingredients are included" implies intersection is not empty.
+    // So let's count matches.
+
+    const recipes = await qb.getMany();
+
+    // Filter out recipes with 0 ingredients just in case (as valid subset but useless result)
+    const validRecipes = recipes.filter(r => r.ingredients && r.ingredients.length > 0);
+
+    // 3. Sort in memory
+    // Sort by:
+    // a. Number of matching ingredients (desc)
+    // b. Likes + Comments (desc)
+    return validRecipes.sort((a, b) => {
+      const countA = a.ingredients.length;
+      const countB = b.ingredients.length;
+      if (countA !== countB) {
+        return countB - countA;
+      }
+      const popularityA = (a.likesCount || 0) + (a.commentsCount || 0);
+      const popularityB = (b.likesCount || 0) + (b.commentsCount || 0);
+      return popularityB - popularityA;
+    });
   }
 
   async fork(originalId: number, userId: number): Promise<Recipe> {

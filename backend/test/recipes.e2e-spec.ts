@@ -98,83 +98,94 @@ describe('RecipesController (e2e)', () => {
             });
     });
 
-    it('/recipes (GET)', async () => {
-        // Ensure at least one recipe exists
-        await request(app.getHttpServer())
+    it('/recipes (GET) - should return recipes sorted by popularity', async () => {
+        // Create Recipe A
+        const rA = await request(app.getHttpServer())
             .post('/recipes')
             .set('Authorization', `Bearer ${token}`)
             .send({
-                name: 'Pancakes',
-                instructions: 'Mix flour and milk. Fry.',
-                ingredients: [
-                    {
-                        quantity: 1,
-                        unit: 'cup',
-                        customIngredientText: 'Flour'
-                    }
-                ]
-            })
+                name: 'SortTest A',
+                instructions: 'Instructions',
+                ingredients: [{ quantity: 1, unit: 'pc', customIngredientText: 'Item' }]
+            }).expect(201);
+
+        // Create Recipe B
+        const rB = await request(app.getHttpServer())
+            .post('/recipes')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: 'SortTest B',
+                instructions: 'Instructions',
+                ingredients: [{ quantity: 1, unit: 'pc', customIngredientText: 'Item' }]
+            }).expect(201);
+
+        // Like Recipe B (Popularity = 1)
+        await request(app.getHttpServer())
+            .post(`/recipes/${rB.body.id}/like`)
+            .set('Authorization', `Bearer ${token}`)
             .expect(201);
 
+        // Get Recipes - Expect B then A (among others)
         return request(app.getHttpServer())
             .get('/recipes')
             .expect(200)
             .expect((res) => {
-                expect(Array.isArray(res.body)).toBe(true);
-                expect(res.body.length).toBeGreaterThan(0);
-                // Note: The database might not be cleared between tests depending on setup,
-                // so we just check if Pancakes exists in the list
-                const recipe = res.body.find(r => r.name === 'Pancakes');
-                expect(recipe).toBeDefined();
+                const recipes = res.body;
+                // Filter to our test recipes
+                const ourRecipes = recipes.filter(r => r.name.startsWith('SortTest'));
+                // Expect at least our 2 recipes (if pagination allows)
+                // If other tests run before, there might be more, but B should be before A
+
+                // Assuming default limit=20 is enough to catch them
+                const indexA = recipes.findIndex(r => r.id === rA.body.id);
+                const indexB = recipes.findIndex(r => r.id === rB.body.id);
+
+                expect(indexA).not.toBe(-1);
+                expect(indexB).not.toBe(-1);
+
+                // B should be before A (lower index)
+                expect(indexB).toBeLessThan(indexA);
             });
     });
 
-    it('/recipes/search (GET) - filter by name and category', async () => {
+    it('/recipes/search (GET) - filter by name and category with sorting', async () => {
         // Create recipes
-        await request(app.getHttpServer()).post('/recipes')
+        const s1 = await request(app.getHttpServer()).post('/recipes')
             .set('Authorization', `Bearer ${token}`)
             .send({
-                name: 'Chicken Soup',
+                name: 'SearchSort Soup A',
                 instructions: 'Cook chicken.',
-                category: 'Soup',
+                category: 'SoupTests',
                 ingredients: [{ quantity: 1, unit: 'bowl', customIngredientText: 'Chicken' }]
             });
-        await request(app.getHttpServer()).post('/recipes')
+        const s2 = await request(app.getHttpServer()).post('/recipes')
             .set('Authorization', `Bearer ${token}`)
             .send({
-                name: 'Tomato Soup',
+                name: 'SearchSort Soup B',
                 instructions: 'Cook tomato.',
-                category: 'Soup',
+                category: 'SoupTests',
                 ingredients: [{ quantity: 1, unit: 'bowl', customIngredientText: 'Tomato' }]
             });
-        await request(app.getHttpServer()).post('/recipes')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                name: 'Chicken Salad',
-                instructions: 'Mix.',
-                category: 'Salad',
-                ingredients: [{ quantity: 1, unit: 'bowl', customIngredientText: 'Chicken' }]
-            });
 
-        // Search for 'Chicken' with category 'Soup'
+        // Like Soup B -> Matches = 1
+        await request(app.getHttpServer())
+            .post(`/recipes/${s2.body.id}/like`)
+            .set('Authorization', `Bearer ${token}`)
+            .expect(201);
+
+        // Search for 'Soup' with category 'SoupTests'
+        // Expect B before A
         return request(app.getHttpServer())
-            .get('/recipes/search?name=Chicken&category=Soup')
+            .get('/recipes/search?name=SearchSort&category=SoupTests')
             .expect(200)
             .expect((res) => {
-                // Since this is e2e on a persistent sqlite file (or if it's cleared), results might vary.
-                // Assuming tests run in sequence or DB is reset, we expect strict match.
-                // However, 'create' calls await valid responses.
+                const recipes = res.body;
+                expect(recipes.length).toBeGreaterThanOrEqual(2);
 
-                // We just check if at least our specific record is found.
-                // Or if the test environment resets the DB. 
-                // Given "dinnery.sqlite" is used in AppModule, it persists unless deleted.
-                // The previous test logic expected exactly 1 length. 
-                // If the DB is shared, this might be flaky if run multiple times.
-                // But keeping original logic for now, just adding auth.
+                const indexA = recipes.findIndex(r => r.id === s1.body.id);
+                const indexB = recipes.findIndex(r => r.id === s2.body.id);
 
-                const found = res.body.find(r => r.name === 'Chicken Soup');
-                expect(found).toBeDefined();
-                expect(found.category).toBe('Soup');
+                expect(indexB).toBeLessThan(indexA);
             });
     });
 
@@ -405,6 +416,69 @@ describe('RecipesController (e2e)', () => {
                 expect(ids).toContain(r3.body.id);
                 // Should NOT contain r2
                 expect(ids).not.toContain(r2.body.id);
+            });
+    });
+
+    it('Search by Ingredients (POST) - Strict Subset Logic', async () => {
+        // 1. Create a recipe with [Tomato, Cheese] -> Match
+        const r1 = await request(app.getHttpServer())
+            .post('/recipes')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: 'Caprese Salad',
+                instructions: 'Slice and mix.',
+                ingredients: [
+                    { quantity: 1, unit: 'pc', customIngredientText: 'Tomato' },
+                    { quantity: 1, unit: 'pc', customIngredientText: 'Cheese' },
+                ]
+            }).expect(201);
+
+        // 2. Create a recipe with [Tomato] -> Match (subset)
+        const r2 = await request(app.getHttpServer())
+            .post('/recipes')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: 'Just Tomato',
+                instructions: 'Eat it.',
+                ingredients: [
+                    { quantity: 1, unit: 'pc', customIngredientText: 'Tomato' },
+                ]
+            }).expect(201);
+
+        // 3. Create a recipe with [Tomato, Cheese, Basil] -> No Match (Basil not in fridge)
+        const r3 = await request(app.getHttpServer())
+            .post('/recipes')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                name: 'Pesto Pasta',
+                instructions: 'Mix.',
+                ingredients: [
+                    { quantity: 1, unit: 'pc', customIngredientText: 'Tomato' },
+                    { quantity: 1, unit: 'pc', customIngredientText: 'Cheese' },
+                    { quantity: 1, unit: 'pc', customIngredientText: 'Basil' },
+                ]
+            }).expect(201);
+
+        // 4. Search for ['Tomato', 'Cheese']
+        // Expect R1 and R2. Sort order: R1 (2 matches) > R2 (1 match).
+        await request(app.getHttpServer())
+            .post('/recipes/search/ingredients')
+            .set('Authorization', `Bearer ${token}`)
+            .send(['Tomato', 'Cheese'])
+            .expect(200)
+            .expect((res) => {
+                expect(Array.isArray(res.body)).toBe(true);
+                const ids = res.body.map(r => r.id);
+                // Verify R1 and R2 are present
+                expect(ids).toContain(r1.body.id);
+                expect(ids).toContain(r2.body.id);
+                // Verify R3 is NOT present
+                expect(ids).not.toContain(r3.body.id);
+
+                // Verify Order: R1 then R2 (filtered list to only relevant ones)
+                const relevant = res.body.filter(r => [r1.body.id, r2.body.id].includes(r.id));
+                expect(relevant[0].id).toBe(r1.body.id);
+                expect(relevant[1].id).toBe(r2.body.id);
             });
     });
 

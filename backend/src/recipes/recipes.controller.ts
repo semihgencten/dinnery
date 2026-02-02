@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards, ParseIntPipe, Patch, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, UseGuards, ParseIntPipe, Patch, Delete, HttpCode } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
 import { Recipe } from './domain/recipe.model';
 import { CreateRecipeDto, UpdateRecipeDto } from './dtos/recipe.dto';
@@ -31,6 +31,12 @@ export class RecipesController {
     @Query('name') name?: string,
   ): Promise<Recipe[]> {
     return this.recipesService.search(name, category);
+  }
+
+  @Post('search/ingredients')
+  @HttpCode(200)
+  async searchByIngredients(@Body() ingredients: string[]): Promise<Recipe[]> {
+    return this.recipesService.searchByIngredients(ingredients);
   }
 
   @Get('user/:userId')

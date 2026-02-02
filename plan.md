@@ -27,8 +27,8 @@ For each feature found in `use_cases.md`, we will follow a strict "Red-Green-Ref
 -   **Test:** `POST /recipes/search/ingredients` (or GET with complex query) sending `['tomato', 'cheese']`.
 -   **API:** `POST /recipes/search/ingredients`.
 -   Contains selection; 1. selected ingredients are included in the recipe. 2. no other ingredients are included in the recipe.
-- sorting: fetched recipes are sorted by the number of matching ingredients in descending order. when the number of matching ingredients is the same, the recipes are sorted by the number of likes + comments + forks in descending order.
--   **Current Status:** 🔴 Not Implemented.
+- sorting: fetched recipes are sorted by the number of matching ingredients in descending order. when the number of matching ingredients is the same, the recipes are sorted by the number of likes + comments in descending order.
+-   **Current Status:** 🟢 Completed.
 
 ### 1.4. Filter by Category (Use Case 9)
 -   **Goal:** Filter recipes by strict category match.
@@ -106,7 +106,6 @@ Edit / Delete Own Recipe
 User Registration & Login
 Social Interactions (Likes/Comments)
 User Profile / My Recipes (Missing me endpoint, full profile view)
-🟡 Partially Implemented:
-Main Page List (Basic list exists, missing metadata/sorting)
-🔴 Not Implemented:
 Search by Ingredients
+🟡 Partially Implemented:
+🔴 Not Implemented:
