@@ -18,6 +18,10 @@ describe('RecipesController', () => {
     'Instructions',
     'photo.jpg',
     null,
+    null,
+    0,
+    0,
+    null,
     new Date(),
     new Date(),
   );
@@ -56,10 +60,11 @@ describe('RecipesController', () => {
       dto.name = 'Test Recipe';
       dto.instructions = 'Instructions';
 
-      const result = await controller.create(dto);
+      const mockRequest = { user: { sub: 1 } };
+      const result = await controller.create(dto, mockRequest);
 
       expect(result).toBe(mockRecipe);
-      expect(service.create).toHaveBeenCalledWith(dto);
+      expect(service.create).toHaveBeenCalledWith(dto, mockRequest.user.sub);
     });
   });
 
