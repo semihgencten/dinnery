@@ -1,6 +1,7 @@
 import { IsString, IsOptional, IsNumber, IsArray, ValidateNested, ValidateIf, IsNotEmpty, Min, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
 import { UserRecipeRole } from '../domain/user-recipe.model';
+import { PartialType } from '@nestjs/swagger';
 
 export class CreateRecipeIngredientDto {
     @ValidateIf(o => !o.customIngredientText)
@@ -56,6 +57,16 @@ export class CreateRecipeDto {
 
     @IsOptional()
     @IsNumber()
+    @Min(0)
+    cookTime?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    prepTime?: number;
+
+    @IsOptional()
+    @IsNumber()
     originalRecipeId?: number;
 
     @IsArray()
@@ -69,6 +80,8 @@ export class CreateRecipeDto {
     userRecipes: UserRecipeDto[];
 }
 
+export class UpdateRecipeDto extends PartialType(CreateRecipeDto) { }
+
 export class RecipeResponseDto {
     id: number;
     name: string;
@@ -76,6 +89,8 @@ export class RecipeResponseDto {
     category: string | null;
     instructions: string;
     photoUrl: string | null;
+    cookTime: number | null;
+    prepTime: number | null;
     originalRecipeId: number | null;
     createdAt: Date;
     updatedAt: Date;

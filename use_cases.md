@@ -3,7 +3,7 @@ A. Base flows and cases
 user -> user with an account and signed in currently
 visitor -> user with no account signed in currently
 
-1.  🟡 **Partially Implemented** - visitor or user (w) enters the main page, see some popular recipes in a list. see their picture, name, category, cook time, like and comment counts of each of them
+1.  🟢 **Completed** - visitor or user (w) enters the main page, see some popular recipes in a list. see their picture, name, category, cook time, like and comment counts of each of them
     user clicks one recipe, goes to the recipe landing page (or recipe detail page, name can change).
     
 2.  🟢 **Completed** - visitor or user clicks to search bar in the main page (or landing page consider the name). enters a word or words to search by recipe name
@@ -36,7 +36,7 @@ visitor -> user with no account signed in currently
     user modifies the recipe (tweaks ingredients, changes steps).
     user saves their version.
 
-6.  🔴 **Not Implemented** - user registration and login
+6.  🟢 **Completed** - user registration and login
     visitor navigates to sign up page.
     visitor enters email, username, password, name, and country.
     visitor submits and confirms email (if applicable) -> becomes a user.
@@ -52,18 +52,25 @@ visitor -> user with no account signed in currently
     user sees a list of "Forked Recipes" or "Saved Recipes".
     user can click to edit or delete their own recipes.
 
-8.  🟢 **Completed** - recipe detailed view
+8.  🟢 **Completed** - Edit/Delete Own Recipe
+    user enters the "My Recipes" view.
+    user selects a recipe they created.
+    user clicks "Edit" to modify details or "Delete" to remove it.
+    system verifies ownership.
+    system performs update or deletion.
+
+9.  🟢 **Completed** - recipe detailed view
     user views a specific recipe.
     sees full details: ingredients list (with quantities), step-by-step instructions, nutrition info (if available), author information.
     sees "Fork" button (if logged in and not author).
     sees "Edit" button (if author).
 
-9.  🟢 **Completed** - filter recipes by category
+10. 🟢 **Completed** - filter recipes by category
     visitor or user views the recipe list.
     user selects a category filter (e.g., "Dinner", "Vegan", "Dessert").
     the list updates to show only recipes belonging to that category.
 
-10. 🔴 **Not Implemented** - social interactions (likes and comments)
+11. 🟢 **Completed**  - social interactions (likes and comments)
     user views a recipe.
     user clicks "Like" button -> like count increases, user marks recipe as liked.
     user types a comment in the comment section and submits -> comment appears on the recipe page.

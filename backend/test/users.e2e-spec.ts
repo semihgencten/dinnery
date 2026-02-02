@@ -16,12 +16,12 @@ describe('UsersController (e2e)', () => {
         await app.init();
     });
 
-    it('/users (POST)', () => {
+    it('/auth/register (POST)', () => {
         const uniqueUsername = `user_${Date.now()}`;
         const uniqueEmail = `${uniqueUsername}@example.com`;
 
         return request(app.getHttpServer())
-            .post('/users')
+            .post('/auth/register')
             .send({
                 name: 'Test User',
                 username: uniqueUsername,
@@ -43,7 +43,7 @@ describe('UsersController (e2e)', () => {
         const uniqueEmail = `${uniqueUsername}@example.com`;
 
         await request(app.getHttpServer())
-            .post('/users')
+            .post('/auth/register')
             .send({
                 name: 'List User',
                 username: uniqueUsername,
@@ -69,7 +69,7 @@ describe('UsersController (e2e)', () => {
         const uniqueEmail = `${uniqueUsername}@example.com`;
 
         const createResponse = await request(app.getHttpServer())
-            .post('/users')
+            .post('/auth/register')
             .send({
                 name: 'Single User',
                 username: uniqueUsername,
@@ -86,6 +86,47 @@ describe('UsersController (e2e)', () => {
             .expect(200)
             .expect((res) => {
                 expect(res.body.id).toBe(id);
+                expect(res.body.username).toBe(uniqueUsername);
+                expect(res.body.email).toBe(uniqueEmail);
+            });
+    });
+
+    it('/users/me (GET) - retrieve own profile', async () => {
+        const uniqueUsername = `me_user_${Date.now()}`;
+        const uniqueEmail = `${uniqueUsername}@example.com`;
+
+        // 1. Register
+        const registerRes = await request(app.getHttpServer())
+            .post('/auth/register')
+            .send({
+                name: 'Me User',
+                username: uniqueUsername,
+                email: uniqueEmail,
+                password: 'password123',
+                country: 'MeLand'
+            })
+            .expect(201);
+
+        const userId = registerRes.body.id;
+
+        // 2. Login to get token
+        const loginRes = await request(app.getHttpServer())
+            .post('/auth/login')
+            .send({
+                username: uniqueUsername,
+                password: 'password123'
+            })
+            .expect(200);
+
+        const token = loginRes.body.accessToken;
+
+        // 3. Get /users/me
+        return request(app.getHttpServer())
+            .get('/users/me')
+            .set('Authorization', `Bearer ${token}`)
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.id).toBe(userId);
                 expect(res.body.username).toBe(uniqueUsername);
                 expect(res.body.email).toBe(uniqueEmail);
             });

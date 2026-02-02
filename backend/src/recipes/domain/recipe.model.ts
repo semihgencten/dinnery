@@ -6,6 +6,10 @@ export class Recipe {
         public readonly category: string | null,
         public readonly instructions: string,
         public readonly photoUrl: string | null,
+        public readonly cookTime: number | null,
+        public readonly prepTime: number | null,
+        public readonly likesCount: number,
+        public readonly commentsCount: number,
         public readonly originalRecipeId: number | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
@@ -17,6 +21,8 @@ export class Recipe {
         category: string | undefined,
         instructions: string,
         photoUrl?: string,
+        cookTime?: number,
+        prepTime?: number,
         originalRecipeId?: number
     ): Partial<Recipe> {
         return {
@@ -25,6 +31,8 @@ export class Recipe {
             category: category?.trim() || null,
             instructions: instructions.trim(),
             photoUrl: photoUrl || null,
+            cookTime: cookTime || null,
+            prepTime: prepTime || null,
             originalRecipeId: originalRecipeId || null
         };
     }

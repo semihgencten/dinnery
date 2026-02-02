@@ -9,8 +9,11 @@ import { RecipeIngredientEntity } from './entities/recipe-ingredient.entity';
 import { UserRecipeEntity } from './entities/user-recipe.entity';
 import { AuthModule } from '../auth/auth.module';
 
+import { RecipeLikeEntity } from './entities/recipe-like.entity';
+import { CommentEntity } from './entities/comment.entity';
+
 @Module({
-  imports: [AuthModule, TypeOrmModule.forFeature([RecipeEntity, RecipeIngredientEntity, UserRecipeEntity])],
+  imports: [AuthModule, TypeOrmModule.forFeature([RecipeEntity, RecipeIngredientEntity, UserRecipeEntity, RecipeLikeEntity, CommentEntity])],
   providers: [RecipesService],
   controllers: [RecipesController],
   exports: [RecipesService]

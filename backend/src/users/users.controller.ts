@@ -1,22 +1,24 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Req } from '@nestjs/common';
+import { AuthGuard } from '../auth/auth.guard';
 import { UsersService } from './users.service';
-import { CreateUserDto, UserResponseDto } from './dtos/user.dto';
+import { UserResponseDto } from './dtos/user.dto';
 import { User } from './domain/user.model';
 
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
-    @Post()
-    async create(@Body() createDto: CreateUserDto): Promise<UserResponseDto> {
-        const user = await this.usersService.create(createDto);
-        return this.toResponse(user);
-    }
-
     @Get()
     async findAll(): Promise<UserResponseDto[]> {
         const users = await this.usersService.findAll();
         return users.map(user => this.toResponse(user));
+    }
+
+    @Get('me')
+    @UseGuards(AuthGuard)
+    async getProfile(@Req() req: any): Promise<UserResponseDto> {
+        const user = await this.usersService.findOne(req.user.sub);
+        return this.toResponse(user);
     }
 
     @Get(':id')

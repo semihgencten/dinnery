@@ -20,6 +20,18 @@ export class RecipeEntity extends BaseEntity {
     @Column({ name: 'photo_url', nullable: true, length: 500 })
     photoUrl: string;
 
+    @Column({ name: 'cook_time', nullable: true })
+    cookTime: number;
+
+    @Column({ name: 'prep_time', nullable: true })
+    prepTime: number;
+
+    @Column({ name: 'likes_count', default: 0 })
+    likesCount: number;
+
+    @Column({ name: 'comments_count', default: 0 })
+    commentsCount: number;
+
     @OneToMany(() => RecipeIngredientEntity, (recipeIngredient) => recipeIngredient.recipe, {
         cascade: true
     })

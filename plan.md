@@ -15,7 +15,7 @@ For each feature found in `use_cases.md`, we will follow a strict "Red-Green-Ref
 ### 1.1. Main Page List (Use Case 1)
 -   **Goal:** Retrieve paginated/popular recipes with metadata (time, likes, comments).
 -   **Test:** `OFFSET /recipes` or plain `GET /recipes` checks for specific fields in response.
--   **Current Status:** 🟡 Partially Implemented. Basic `GET /recipes` exists. Needs enhancement for metadata.
+-   **Current Status:** 🟢 Completed.
 
 ### 1.2. Search by Name (Use Case 2)
 -   **Goal:** Search recipes by fuzzy name matching.
@@ -56,7 +56,7 @@ For each feature found in `use_cases.md`, we will follow a strict "Red-Green-Ref
     -   `PATCH /recipes/:id` (Success for owner).
     -   `PATCH /recipes/:id` (403 Forbidden for non-owner).
     -   `DELETE /recipes/:id` (Success for owner).
--   **Current Status:** 🔴 Not Implemented.
+-   **Current Status:** 🟢 Completed.
 
 ---
 
@@ -67,12 +67,12 @@ For each feature found in `use_cases.md`, we will follow a strict "Red-Green-Ref
 -   **Test:** 
     -   `POST /auth/signup` -> 201 Created.
     -   `POST /auth/login` -> 200 OK & returns `{ accessToken: ... }`.
--   **Current Status:** 🔴 Not Implemented.
+-   **Current Status:** 🟢 **Completed** 
 
 ### 3.2. User Profile / My Recipes (Use Case 7)
 -   **Goal:** Get current user's created and forked recipes.
 -   **Test:** `GET /users/me/recipes` or `GET /recipes/user/:userId`.
--   **Current Status:** 🟡 Partially Implemented.
+-   **Current Status:** 🟢 Completed.
 
 ### 3.3. Social Interactions (Use Case 10)
 -   **Goal:** Like and key-value comment on recipes.
@@ -80,7 +80,7 @@ For each feature found in `use_cases.md`, we will follow a strict "Red-Green-Ref
     -   `POST /recipes/:id/like` -> Increment count.
     -   `POST /recipes/:id/comments` -> Add comment.
     -   `GET /recipes/:id` -> Include 'likes' count and 'comments' list.
--   **Current Status:** 🔴 Not Implemented.
+-   **Current Status:** 🟢 **Completed** 
 
 ---
 
@@ -100,11 +100,11 @@ Create Recipe
 Fork Recipe
 Recipe Detailed View
 Permissions / Role Guards
+Edit / Delete Own Recipe
+User Registration & Login
+Social Interactions (Likes/Comments)
+User Profile / My Recipes (Missing me endpoint, full profile view)
 🟡 Partially Implemented:
 Main Page List (Basic list exists, missing metadata/sorting)
-User Profile / My Recipes (Missing me endpoint, full profile view)
 🔴 Not Implemented:
 Search by Ingredients
-Edit / Delete Own Recipe
-User Registration & Login (Login logic missing)
-Social Interactions (Likes/Comments)
