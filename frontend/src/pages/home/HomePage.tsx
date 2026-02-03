@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../context/store.context';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '../../components/ui/Button';
 import { RecipeCard } from '../../components/RecipeCard';
 import { SearchBar } from '../../components/SearchBar';
 import { CategoryFilter } from '../../components/CategoryFilter';
@@ -8,6 +10,7 @@ import './HomePage.css';
 
 export const HomePage = observer(() => {
     const { recipesStore, authStore } = useStore();
+    const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [category, setCategory] = useState<string | undefined>(undefined);
 
@@ -28,10 +31,18 @@ export const HomePage = observer(() => {
         <div className="home-page">
             <div className="hero-section">
                 <h1>Find your next favorite meal 🍽️</h1>
-                {authStore.isAuthenticated && (
-                    <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginTop: '-0.5rem' }}>
-                        Welcome back, {authStore.user?.name}
-                    </p>
+                {authStore.isAuthenticated ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '-0.5rem' }}>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', margin: 0 }}>
+                            Welcome back, {authStore.user?.name}
+                        </p>
+                        <Button variant="secondary" onClick={() => authStore.logout()}>Logout</Button>
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                        <Button onClick={() => navigate('/login')}>Login</Button>
+                        <Button variant="secondary" onClick={() => navigate('/signup')}>Sign Up</Button>
+                    </div>
                 )}
 
                 <SearchBar
