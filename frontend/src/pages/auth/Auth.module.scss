@@ -1,0 +1,55 @@
+.pageContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+    background: radial-gradient(circle at top left, #2b3035 0%, #121212 100%);
+}
+
+.authCard {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    border-radius: var(--radius-md);
+
+    // Inherit global glass class properties effectively, or just compose them if we used CSS modules composition, 
+    // but simpler to just restyle here or wrap in div.glass
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    @media (min-width: 768px) {
+        font-size: 2.5rem;
+    }
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+
+    a {
+        margin-left: 0.25rem;
+        font-weight: 500;
+    }
+}
