@@ -16,7 +16,13 @@ export class RecipeMapper {
             entity.commentsCount,
             entity.originalRecipeId || null,
             entity.createdAt,
-            entity.updatedAt
+            entity.updatedAt,
+            entity.ingredients?.map(i => ({
+                name: i.customIngredientText || i.ingredient?.name || 'Unknown Ingredient',
+                quantity: Number(i.quantity),
+                unit: i.unit,
+                notes: i.notes
+            })) || null
         );
     }
 

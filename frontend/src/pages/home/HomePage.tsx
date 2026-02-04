@@ -60,11 +60,11 @@ export const HomePage = observer(() => {
             <div className="recipes-grid">
                 {recipesStore.isLoading ? (
                     Array.from({ length: 8 }).map((_, i) => (
-                        <div key={i} className="recipe-card" style={{ height: '340px', animation: 'Pulse 1.5s infinite' }}>
-                            <div className="card-image-container" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}></div>
-                            <div className="card-content">
-                                <div style={{ height: '24px', width: '70%', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', marginBottom: '8px' }}></div>
-                                <div style={{ height: '16px', width: '40%', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}></div>
+                        <div key={i} className="skeleton-card">
+                            <div className="skeleton-image"></div>
+                            <div className="skeleton-content">
+                                <div className="skeleton-text" style={{ height: '24px', width: '80%' }}></div>
+                                <div className="skeleton-text" style={{ height: '16px', width: '40%' }}></div>
                             </div>
                         </div>
                     ))
@@ -79,14 +79,6 @@ export const HomePage = observer(() => {
                     </div>
                 )}
             </div>
-
-            <style>{`
-                @keyframes Pulse {
-                    0% { opacity: 0.6; }
-                    50% { opacity: 0.3; }
-                    100% { opacity: 0.6; }
-                }
-            `}</style>
         </div>
     );
 });

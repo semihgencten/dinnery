@@ -4,6 +4,8 @@ import { useStore } from './context/store.context';
 import { LoginPage } from './pages/auth/LoginPage';
 import { SignupPage } from './pages/auth/SignupPage';
 import { HomePage } from './pages/home/HomePage';
+import { RecipeDetailPage } from './pages/recipe/RecipeDetailPage';
+import { MainLayout } from './layouts/MainLayout';
 
 const App = observer(() => {
   const { authStore } = useStore();
@@ -15,7 +17,7 @@ const App = observer(() => {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        color: 'white'
+        color: 'var(--text-main)'
       }}>
         Loading...
       </div>
@@ -23,19 +25,22 @@ const App = observer(() => {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route
-        path="/login"
-        element={!authStore.isAuthenticated ? <LoginPage /> : <Navigate to="/" />}
-      />
-      <Route
-        path="/signup"
-        element={!authStore.isAuthenticated ? <SignupPage /> : <Navigate to="/" />}
-      />
-      {/* Fallback route */}
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <MainLayout>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/recipes/:id" element={<RecipeDetailPage />} />
+        <Route
+          path="/login"
+          element={!authStore.isAuthenticated ? <LoginPage /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/signup"
+          element={!authStore.isAuthenticated ? <SignupPage /> : <Navigate to="/" />}
+        />
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </MainLayout>
   );
 });
 

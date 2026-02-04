@@ -13,6 +13,12 @@ export class Recipe {
         public readonly originalRecipeId: number | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date,
+        public readonly ingredients: {
+            name: string;
+            quantity: number;
+            unit: string;
+            notes: string | null;
+        }[] | null = null,
     ) { }
 
     static create(

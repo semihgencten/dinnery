@@ -28,6 +28,7 @@ export class RecipesService {
   async findOne(id: number): Promise<Recipe> {
     const entity = await this.recipeRepo.findOne({
       where: { id },
+      relations: ['ingredients', 'ingredients.ingredient', 'userRecipes', 'userRecipes.user']
     });
 
     if (!entity) {
@@ -106,9 +107,10 @@ export class RecipesService {
     return RecipeMapper.toDomainList(entities);
   }
   async findByUserAndRole(userId: number, role: UserRecipeRole): Promise<Recipe[]> {
-    return this.recipeRepo.find({
+    const entities = await this.recipeRepo.find({
       where: { userRecipes: { userId, role } },
     });
+    return RecipeMapper.toDomainList(entities);
   }
 
   async search(name?: string, category?: string): Promise<Recipe[]> {
@@ -193,7 +195,7 @@ export class RecipesService {
     // Sort by:
     // a. Number of matching ingredients (desc)
     // b. Likes + Comments (desc)
-    return validRecipes.sort((a, b) => {
+    const sortedEntities = validRecipes.sort((a, b) => {
       const countA = a.ingredients.length;
       const countB = b.ingredients.length;
       if (countA !== countB) {
@@ -203,6 +205,8 @@ export class RecipesService {
       const popularityB = (b.likesCount || 0) + (b.commentsCount || 0);
       return popularityB - popularityA;
     });
+
+    return RecipeMapper.toDomainList(sortedEntities);
   }
 
   async fork(originalId: number, userId: number): Promise<Recipe> {

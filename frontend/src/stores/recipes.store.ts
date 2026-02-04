@@ -16,10 +16,27 @@ export interface Recipe {
     createdAt: string;
     updatedAt: string;
     // user/author is not currently available in backend response
+    ingredients?: {
+        name: string;
+        quantity: number;
+        unit: string;
+        notes: string | null;
+    }[];
+}
+
+export interface Comment {
+    id: number;
+    text: string;
+    userId: number;
+    recipeId: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export class RecipesStore {
     recipes: Recipe[] = [];
+    currentRecipe: Recipe | null = null;
+    currentRecipeComments: Comment[] = [];
     isLoading = false;
 
     constructor() {
@@ -65,6 +82,37 @@ export class RecipesStore {
             runInAction(() => {
                 this.isLoading = false;
             });
+        }
+    }
+
+    async fetchRecipe(id: string) {
+        this.isLoading = true;
+        this.currentRecipe = null;
+        this.currentRecipeComments = [];
+        try {
+            const response = await api.get(`/recipes/${id}`);
+            runInAction(() => {
+                this.currentRecipe = response.data;
+            });
+            // Fetch comments in parallel or after
+            this.fetchComments(id);
+        } catch (error) {
+            console.error(`Failed to fetch recipe ${id}`, error);
+        } finally {
+            runInAction(() => {
+                this.isLoading = false;
+            });
+        }
+    }
+
+    async fetchComments(id: string) {
+        try {
+            const response = await api.get(`/recipes/${id}/comments`);
+            runInAction(() => {
+                this.currentRecipeComments = response.data;
+            });
+        } catch (error) {
+            console.error(`Failed to fetch comments for recipe ${id}`, error);
         }
     }
 }

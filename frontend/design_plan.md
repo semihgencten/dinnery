@@ -117,3 +117,35 @@ This document outlines the structure, pages, and features for the Dinnery fronte
 - **Navbar:** Sticky top. Logo, Search (shrunk version), Links (Home, Search), Auth Buttons (Login/Signup OR Avatar/Profile Menu).
 - **Footer:** Simple links.
 - **Responsive:** Mobile-first approach. Grid layouts for standard desktop views, stacked for mobile.
+
+### 4.3. Styling Conventions (Strict)
+This project adheres to a strict design system to ensure consistency and scalability.
+
+1.  **CSS Variables (`index.css` is the Source of Truth):**
+    -   NEVER hardcode hex colors, spacing values, or font sizes in component CSS.
+    -   Always use the defined CSS variables (e.g., `var(--primary-color)`, `var(--space-4)`, `var(--font-lg)`).
+
+2.  **Units (No Pixels):**
+    -   **REM/EM Only:** Do strictly NOT use `px` for layouts, padding, margins, or font sizes.
+    -   **Base:** The system assumes a standard root font size (16px default), where `1rem = 16px`.
+    -   **Borders:** Use `0.0625rem` for 1px borders.
+    -   **Media Queries:** Use `em` for media query breakpoints (e.g., `max-width: 48em` for 768px).
+
+3.  **Spacing Scale:**
+    -   Use the `--space-*` scale for all padding, margin, and gap values.
+    -   The scale is based on a 4px (0.25rem) grid:
+        -   `--space-1`: 0.25rem (4px)
+        -   ...
+        -   `--space-4`: 1rem (16px)
+        -   ...
+        -   `--space-8`: 2rem (32px)
+
+4.  **Typography:**
+    -   Use the `--font-*` scale for all text sizing.
+    -   `--font-base` (1rem) is the body copy size.
+    -   Headings should scale up from there (e.g., `--font-2xl`, `--font-4xl`).
+
+5.  **Breakpoints:**
+    -   Mobile: `30em` (480px)
+    -   Tablet: `48em` (768px)
+    -   Desktop: `64em` (1024px)
