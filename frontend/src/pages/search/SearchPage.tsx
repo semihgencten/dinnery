@@ -6,7 +6,7 @@ import { SearchBar } from '../../components/SearchBar';
 import { CategoryFilter } from '../../components/CategoryFilter';
 import { IngredientFilter } from '../../components/IngredientFilter';
 import { useSearchParams } from 'react-router-dom';
-import './SearchPage.css';
+import './SearchPage.scss';
 
 export const SearchPage = observer(() => {
     const { recipesStore } = useStore();

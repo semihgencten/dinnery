@@ -10,6 +10,7 @@ import { MyRecipesPage } from './pages/recipe/MyRecipesPage';
 import { CreateRecipePage } from './pages/recipe/CreateRecipePage';
 import { SearchPage } from './pages/search/SearchPage';
 import { SavedRecipesPage } from './pages/recipe/SavedRecipesPage';
+import { ProfilePage } from './pages/profile/ProfilePage';
 
 
 const App = observer(() => {
@@ -42,6 +43,10 @@ const App = observer(() => {
         <Route
           path="/saved"
           element={authStore.isAuthenticated ? <SavedRecipesPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/profile"
+          element={authStore.isAuthenticated ? <ProfilePage /> : <Navigate to="/login" />}
         />
 
         <Route

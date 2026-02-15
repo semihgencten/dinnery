@@ -14,6 +14,12 @@ export class CreateUserDto {
     language: string;
 }
 
+export class UpdateUserDto {
+    @IsString()
+    @IsOptional()
+    language?: string;
+}
+
 export class UserResponseDto {
     id: number;
     email: string;

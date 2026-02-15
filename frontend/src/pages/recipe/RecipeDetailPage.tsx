@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../../context/store.context';
-import styles from './RecipeDetailPage.module.css';
+import styles from './RecipeDetailPage.module.scss';
 
 export const RecipeDetailPage = observer(() => {
     const { id } = useParams<{ id: string }>();

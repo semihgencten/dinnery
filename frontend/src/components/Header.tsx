@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, Bookmark, ChefHat, PlusSquare, User } from 'lucide-react';
 import { useStore } from '../context/store.context';
 import { observer } from 'mobx-react-lite';
-import styles from './Header.module.css';
+import styles from './Header.module.scss';
 
 export const Header = observer(() => {
     const { authStore } = useStore();

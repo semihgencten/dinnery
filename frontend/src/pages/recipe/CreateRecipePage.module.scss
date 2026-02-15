@@ -2,20 +2,19 @@
     max-width: 64rem;
     /* 1024px */
     margin: 0 auto;
-    padding: var(--space-4);
 }
 
 .title {
-    font-size: var(--font-3xl);
+    font-size: var(--font-2xl);
     font-weight: 700;
     color: var(--text-main);
-    margin-bottom: var(--space-6);
+    margin-top: var(--space-1);
+    margin-bottom: var(--space-1);
     text-align: center;
 }
 
 .form {
     background-color: var(--surface-card);
-    padding: var(--space-6);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     display: flex;

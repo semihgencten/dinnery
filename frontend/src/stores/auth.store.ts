@@ -104,6 +104,18 @@ export class AuthStore {
         }
     }
 
+    async updateProfile(data: { language?: string }) {
+        try {
+            const response = await api.patch<User>('/users/me', data);
+            runInAction(() => {
+                this.user = response.data;
+            });
+        } catch (error) {
+            console.error('Update profile failed', error);
+            throw error;
+        }
+    }
+
     logout() {
         this.setToken(null);
         this.setRefreshToken(null);

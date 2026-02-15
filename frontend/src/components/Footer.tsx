@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram } from 'lucide-react';
-import styles from './Footer.module.css';
+import styles from './Footer.module.scss';
 
 export const Footer = () => {
     return (

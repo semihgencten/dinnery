@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import './IngredientFilter.css';
+import './IngredientFilter.scss';
 
 interface IngredientFilterProps {
     selected: string[];

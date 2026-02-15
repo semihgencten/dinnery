@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '../../context/store.context';
 import { useEffect } from 'react';
 import { RecipeCard } from '../../components/RecipeCard';
-import styles from './SavedRecipesPage.module.css';
+import styles from './SavedRecipesPage.module.scss';
 
 export const SavedRecipesPage = observer(() => {
     const { recipesStore, authStore } = useStore();
@@ -11,7 +11,7 @@ export const SavedRecipesPage = observer(() => {
         if (authStore.user) {
             recipesStore.fetchSavedRecipes(authStore.user.id);
         }
-    }, [authStore.user]);
+    }, []);
 
     return (
         <div className={styles.container}>
@@ -23,8 +23,8 @@ export const SavedRecipesPage = observer(() => {
                         <div key={i} className="skeleton-card" style={{ height: '340px', background: 'var(--bg-card)', borderRadius: 'var(--radius-md)' }}>
                         </div>
                     ))
-                ) : recipesStore.recipes.length > 0 ? (
-                    recipesStore.recipes.map(recipe => (
+                ) : recipesStore.savedRecipes.length > 0 ? (
+                    recipesStore.savedRecipes.map(recipe => (
                         <RecipeCard key={recipe.id} recipe={recipe} />
                     ))
                 ) : (

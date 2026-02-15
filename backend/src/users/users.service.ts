@@ -61,7 +61,23 @@ export class UsersService {
         return UserMapper.toDomain(entity);
     }
 
+    async update(id: number, updateData: Partial<UserEntity>): Promise<User> {
+        const userEntity = await this.userRepo.findOne({ where: { id } });
+
+        if (!userEntity) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        if (updateData.language) {
+            userEntity.language = updateData.language;
+        }
+
+        const updated = await this.userRepo.save(userEntity);
+        return UserMapper.toDomain(updated);
+    }
+
     async findAll(): Promise<User[]> {
+
         const entities = await this.userRepo.find();
         return UserMapper.toDomainList(entities);
     }

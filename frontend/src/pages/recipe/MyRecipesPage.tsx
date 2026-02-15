@@ -2,7 +2,7 @@ import { observer } from 'mobx-react-lite';
 import { useStore } from '../../context/store.context';
 import { useEffect } from 'react';
 import { RecipeCard } from '../../components/RecipeCard';
-import styles from './MyRecipesPage.module.css';
+import styles from './MyRecipesPage.module.scss';
 
 export const MyRecipesPage = observer(() => {
     const { recipesStore, authStore } = useStore();

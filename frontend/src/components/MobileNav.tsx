@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, PlusSquare, Bookmark, User } from 'lucide-react';
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../context/store.context';
-import styles from './MobileNav.module.css';
+import styles from './MobileNav.module.scss';
 
 export const MobileNav = observer(() => {
     const location = useLocation();

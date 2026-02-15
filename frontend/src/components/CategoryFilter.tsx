@@ -1,4 +1,4 @@
-import './CategoryFilter.css';
+import './CategoryFilter.scss';
 
 interface CategoryFilterProps {
     selected: string | undefined;

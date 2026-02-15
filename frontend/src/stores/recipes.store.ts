@@ -39,6 +39,7 @@ export interface Comment {
 
 export class RecipesStore {
     recipes: Recipe[] = [];
+    savedRecipes: Recipe[] = [];
     currentRecipe: Recipe | null = null;
     currentRecipeComments: Comment[] = [];
     isLoading = false;
@@ -193,7 +194,7 @@ export class RecipesStore {
             });
             // TODO: Filter by collection if needed, or backend should handle it
             runInAction(() => {
-                this.recipes = response.data;
+                this.savedRecipes = response.data;
             });
         } catch (error) {
             console.error('Failed to fetch saved recipes', error);

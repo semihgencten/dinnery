@@ -105,7 +105,8 @@ export class RecipesService {
       .leftJoinAndSelect('ur.user', 'u')
       .skip(offset)
       .take(limit)
-      .orderBy('recipe.likesCount + recipe.commentsCount', 'DESC')
+      .addSelect('recipe.likesCount + recipe.commentsCount', 'popularity')
+      .orderBy('popularity', 'DESC')
       .addOrderBy('recipe.createdAt', 'DESC')
       .getMany();
     return RecipeMapper.toDomainList(entities, userId);
@@ -132,7 +133,8 @@ export class RecipesService {
       qb.andWhere('recipe.category = :category', { category });
     }
 
-    qb.orderBy('recipe.likesCount + recipe.commentsCount', 'DESC');
+    qb.addSelect('recipe.likesCount + recipe.commentsCount', 'popularity');
+    qb.orderBy('popularity', 'DESC');
 
     const entities = await qb.getMany();
     return RecipeMapper.toDomainList(entities, userId);

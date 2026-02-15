@@ -3,7 +3,7 @@ import { useStore } from '../context/store.context';
 import { type Recipe } from '../stores/recipes.store';
 import { Clock, Heart, ChefHat, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import './RecipeDiscoveryCard.css';
+import './RecipeDiscoveryCard.scss';
 
 interface RecipeDiscoveryCardProps {
     recipe: Recipe;

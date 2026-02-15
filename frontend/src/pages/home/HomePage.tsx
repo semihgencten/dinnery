@@ -3,7 +3,7 @@ import { useStore } from '../../context/store.context';
 import { useEffect, useState } from 'react';
 import { RecipeDiscoveryCard } from '../../components/RecipeDiscoveryCard';
 import { SearchBar } from '../../components/SearchBar';
-import './HomePage.css';
+import './HomePage.scss';
 
 export const HomePage = observer(() => {
     const { recipesStore } = useStore();
