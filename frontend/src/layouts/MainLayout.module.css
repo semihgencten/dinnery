@@ -11,4 +11,12 @@
     max-width: var(--container-width);
     margin: 0 auto;
     padding: var(--space-8) var(--space-6);
+    /* Space for mobile nav */
+    padding-bottom: calc(var(--space-8) + 60px);
+}
+
+@media (min-width: 48em) {
+    .main {
+        padding-bottom: var(--space-8);
+    }
 }

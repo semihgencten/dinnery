@@ -11,15 +11,13 @@ export const SignupPage = observer(() => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        name: '',
-        username: '',
         email: '',
         password: '',
-        country: '',
+        language: 'en',
     });
     const [error, setError] = useState('');
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
@@ -29,16 +27,11 @@ export const SignupPage = observer(() => {
 
         try {
             await authStore.register(formData);
-            // After registration, maybe auto login?
-            // Store implementation just returns data, doesn't set token.
-            // So we login automatically or ask them to login.
-            // Let's try to login automatically if we have password.
 
             try {
                 await authStore.login(formData.email, formData.password);
                 navigate('/');
             } catch {
-                // Fallback if auto-login fails
                 navigate('/login');
             }
 
@@ -56,26 +49,6 @@ export const SignupPage = observer(() => {
 
                 <form onSubmit={handleSubmit} className={styles.form}>
                     {error && <div style={{ color: '#ff6b6b', textAlign: 'center', fontSize: '0.9rem' }}>{error}</div>}
-
-                    <Input
-                        id="name"
-                        name="name"
-                        label="Full Name"
-                        placeholder="John Doe"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <Input
-                        id="username"
-                        name="username"
-                        label="Username"
-                        placeholder="johndoe"
-                        value={formData.username}
-                        onChange={handleChange}
-                        required
-                    />
 
                     <Input
                         id="email"
@@ -99,15 +72,32 @@ export const SignupPage = observer(() => {
                         required
                     />
 
-                    <Input
-                        id="country"
-                        name="country"
-                        label="Country"
-                        placeholder="USA"
-                        value={formData.country}
-                        onChange={handleChange}
-                        required
-                    />
+                    <div className={styles.formGroup}>
+                        <label htmlFor="language" className={styles.label}>Language</label>
+                        <select
+                            id="language"
+                            name="language"
+                            value={formData.language}
+                            onChange={handleChange}
+                            className={styles.select}
+                            style={{
+                                width: '100%',
+                                padding: '0.75rem',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                background: 'rgba(255, 255, 255, 0.05)',
+                                color: 'var(--text-primary)',
+                                outline: 'none',
+                                marginTop: '0.5rem'
+                            }}
+                        >
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="tr">Turkish</option>
+                        </select>
+                    </div>
 
                     <Button
                         type="submit"

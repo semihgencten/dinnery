@@ -3,11 +3,8 @@ import { api } from '../lib/axios';
 
 export interface User {
     id: number;
-    name: string;
-    username: string;
     email: string;
-    country: string;
-    avatar: string | null;
+    language: string;
 }
 
 interface LoginResponse {
@@ -18,6 +15,7 @@ interface LoginResponse {
 export class AuthStore {
     user: User | null = null;
     token: string | null = localStorage.getItem('token');
+    refreshToken: string | null = localStorage.getItem('refreshToken');
     isLoading = false;
 
     constructor() {
@@ -40,12 +38,23 @@ export class AuthStore {
         }
     }
 
+    setRefreshToken(token: string | null) {
+        this.refreshToken = token;
+        if (token) {
+            localStorage.setItem('refreshToken', token);
+        } else {
+            localStorage.removeItem('refreshToken');
+        }
+    }
+
     async login(email: string, password: string) {
         this.isLoading = true;
         try {
             const response = await api.post<LoginResponse>('/auth/login', { email, password });
             runInAction(() => {
                 this.setToken(response.data.accessToken);
+                this.setRefreshToken(response.data.refreshToken); // Store refresh token
+                this.isLoading = false;
             });
             await this.loadUser();
         } catch (error) {
@@ -86,7 +95,8 @@ export class AuthStore {
             });
         } catch (error) {
             console.error('Load user failed', error);
-            this.logout();
+            // Don't logout immediately on loadUser failure, it might be just network error
+            // But if it's 401, the interceptor will handle it or we can clearer logic here
         } finally {
             runInAction(() => {
                 this.isLoading = false;
@@ -96,6 +106,31 @@ export class AuthStore {
 
     logout() {
         this.setToken(null);
+        this.setRefreshToken(null);
         this.user = null;
+    }
+
+    async refreshAccessToken() {
+        if (!this.refreshToken) {
+            this.logout();
+            throw new Error('No refresh token available');
+        }
+
+        try {
+            const response = await api.post<{ accessToken: string }>('/auth/refresh', {
+                refreshToken: this.refreshToken,
+            });
+
+            runInAction(() => {
+                this.setToken(response.data.accessToken);
+                // Currently backend doesn't return new refresh token, but if it did, update it here
+            });
+
+            return response.data.accessToken;
+        } catch (error) {
+            console.error('Refresh token failed', error);
+            this.logout();
+            throw error;
+        }
     }
 }

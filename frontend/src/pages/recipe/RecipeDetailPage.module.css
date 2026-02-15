@@ -61,6 +61,12 @@
     color: var(--primary-color);
 }
 
+.actionButton.saved {
+    background-color: #FFF1F2;
+    color: #E11D48;
+    border-color: #E11D48;
+}
+
 .metaInfo {
     display: flex;
     flex-wrap: wrap;

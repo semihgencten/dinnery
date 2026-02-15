@@ -1,0 +1,71 @@
+.search-page {
+    padding-bottom: var(--space-16);
+}
+
+.search-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    /* stick to top? maybe not for now */
+}
+
+.search-header h1 {
+    font-size: var(--font-2xl);
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.filters-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.filters-section h3 {
+    font-size: var(--font-md);
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-2);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.filter-label {
+    font-size: var(--font-sm);
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+/* Reuse Grid Styles */
+.recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
+    gap: var(--space-8);
+    padding: var(--space-4) 0;
+    width: 100%;
+}
+
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-8);
+    color: var(--text-muted);
+    background: var(--bg-surface-secondary);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border-color);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 48em) {
+    .recipes-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-4);
+    }
+}

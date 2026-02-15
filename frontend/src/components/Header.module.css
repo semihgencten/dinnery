@@ -27,7 +27,7 @@
 }
 
 .nav {
-    display: flex;
+    display: none;
     align-items: center;
     gap: var(--space-6);
 }
@@ -39,7 +39,6 @@
     color: var(--text-main);
     font-weight: 500;
     font-size: var(--font-base);
-    /* 16px, close to 15px */
 }
 
 .navLink:hover {
@@ -48,18 +47,35 @@
 
 .icon {
     width: var(--space-5);
-    /* 20px, close to 18px */
     height: var(--space-5);
+}
+
+.createBtn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    border: none;
+    font-weight: 600;
+    font-size: var(--font-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: background-color 0.2s;
+}
+
+.createBtn:hover {
+    background-color: var(--primary-hover);
 }
 
 .loginBtn {
     background-color: var(--primary-color);
     color: white;
-    padding: var(--space-3) var(--space-6);
+    padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-full);
     border: none;
     font-weight: 600;
-    font-size: var(--font-base);
+    font-size: var(--font-sm);
     transition: background-color 0.2s;
 }
 
@@ -67,12 +83,35 @@
     background-color: var(--primary-hover);
 }
 
+.outlineBtn {
+    background-color: transparent;
+    color: var(--text-main);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    border: 0.0625rem solid var(--border-color);
+    font-weight: 600;
+    font-size: var(--font-sm);
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.outlineBtn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.userMenu {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
 .navText {
-    display: none;
+    display: inline;
 }
 
 @media (min-width: 48em) {
-    .navText {
-        display: inline;
+    .nav {
+        display: flex;
     }
 }

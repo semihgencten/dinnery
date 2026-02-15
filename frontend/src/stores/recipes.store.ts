@@ -15,13 +15,17 @@ export interface Recipe {
     originalRecipeId: number | null;
     createdAt: string;
     updatedAt: string;
-    // user/author is not currently available in backend response
+    author?: {
+        id: number;
+        username: string;
+    };
     ingredients?: {
         name: string;
         quantity: number;
         unit: string;
         notes: string | null;
     }[];
+    isSaved: boolean;
 }
 
 export interface Comment {
@@ -115,4 +119,125 @@ export class RecipesStore {
             console.error(`Failed to fetch comments for recipe ${id}`, error);
         }
     }
+
+    async fetchUserRecipes(userId: number) {
+        this.isLoading = true;
+        try {
+            const response = await api.get(`/recipes/user/${userId}`, {
+                params: { role: 'creator' }
+            });
+            runInAction(() => {
+                this.recipes = response.data;
+            });
+        } catch (error) {
+            console.error('Failed to fetch user recipes', error);
+        } finally {
+            runInAction(() => {
+                this.isLoading = false;
+            });
+        }
+    }
+
+    async createRecipe(recipeData: CreateRecipePayload) {
+        this.isLoading = true;
+        try {
+            const response = await api.post('/recipes', recipeData);
+            runInAction(() => {
+                this.recipes.unshift(response.data);
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Failed to create recipe', error);
+            throw error;
+        } finally {
+            runInAction(() => {
+                this.isLoading = false;
+            });
+        }
+    }
+
+    async searchIngredients(term: string) {
+        try {
+            const response = await api.get('/ingredients/search', {
+                params: { term }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Failed to search ingredients', error);
+            return [];
+        }
+    }
+
+    async searchRecipesByIngredients(ingredients: string[]) {
+        this.isLoading = true;
+        try {
+            const response = await api.post('/recipes/search/ingredients', ingredients);
+            runInAction(() => {
+                this.recipes = response.data;
+            });
+            return response.data as Recipe[];
+        } catch (error) {
+            console.error('Failed to search recipes by ingredients', error);
+            return [];
+        } finally {
+            runInAction(() => {
+                this.isLoading = false;
+            });
+        }
+    }
+    async fetchSavedRecipes(userId: number, collection?: string) {
+        this.isLoading = true;
+        try {
+            const response = await api.get(`/recipes/user/${userId}`, {
+                params: { role: 'saved' }
+            });
+            // TODO: Filter by collection if needed, or backend should handle it
+            runInAction(() => {
+                this.recipes = response.data;
+            });
+        } catch (error) {
+            console.error('Failed to fetch saved recipes', error);
+        } finally {
+            runInAction(() => {
+                this.isLoading = false;
+            });
+        }
+    }
+
+    async saveRecipe(recipeId: number, collection?: string) {
+        try {
+            await api.post(`/recipes/${recipeId}/save`, { collection });
+        } catch (error) {
+            console.error('Failed to save recipe', error);
+            throw error;
+        }
+    }
+
+    async unsaveRecipe(recipeId: number, collection?: string) {
+        try {
+            await api.delete(`/recipes/${recipeId}/save`, {
+                params: { collection }
+            });
+        } catch (error) {
+            console.error('Failed to unsave recipe', error);
+            throw error;
+        }
+    }
+}
+
+export interface CreateRecipePayload {
+    name: string;
+    description?: string;
+    category?: string;
+    instructions: string;
+    photoUrl?: string;
+    cookTime?: number;
+    prepTime?: number;
+    ingredients: {
+        ingredientId?: number;
+        quantity: number;
+        unit: string;
+        customIngredientText?: string;
+        notes?: string;
+    }[];
 }

@@ -9,6 +9,7 @@ export class UserRecipe {
     userId: number;
     recipeId: number;
     role: UserRecipeRole;
+    collection?: string;
     createdAt: Date;
     updatedAt: Date;
 }

@@ -36,25 +36,19 @@ export class UsersService {
     }
 
     async create(createDto: CreateUserDto): Promise<User> {
-        // Check for existing username or email
+        // Check for existing email
         const existing = await this.userRepo.findOne({
-            where: [
-                { username: createDto.username },
-                { email: createDto.email }
-            ]
+            where: { email: createDto.email }
         });
 
         if (existing) {
-            throw new ConflictException('User with this username or email already exists');
+            throw new ConflictException('User with this email already exists');
         }
 
         const domainData = new User({
-            name: createDto.name,
-            username: createDto.username,
             email: createDto.email,
             password: createDto.password,
-            country: createDto.country,
-            avatar: createDto.avatar
+            language: createDto.language,
         });
 
         const entityData = UserMapper.toEntity(domainData);

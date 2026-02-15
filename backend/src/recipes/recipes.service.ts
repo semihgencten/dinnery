@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Like, Repository, DataSource } from 'typeorm';
+import { Like, Repository, DataSource, IsNull } from 'typeorm';
 import { RecipeEntity } from './entities/recipe.entity';
 import { RecipeIngredientEntity } from './entities/recipe-ingredient.entity';
 import { Recipe } from './domain/recipe.model';
@@ -22,10 +22,12 @@ export class RecipesService {
     private recipeLikeRepo: Repository<RecipeLikeEntity>,
     @InjectRepository(CommentEntity)
     private commentRepo: Repository<CommentEntity>,
+    @InjectRepository(UserRecipeEntity)
+    private userRecipeRepo: Repository<UserRecipeEntity>,
     private dataSource: DataSource,
   ) { }
 
-  async findOne(id: number): Promise<Recipe> {
+  async findOne(id: number, userId?: number): Promise<Recipe> {
     const entity = await this.recipeRepo.findOne({
       where: { id },
       relations: ['ingredients', 'ingredients.ingredient', 'userRecipes', 'userRecipes.user']
@@ -35,7 +37,7 @@ export class RecipesService {
       throw new NotFoundException(`Recipe with ID ${id} not found`);
     }
 
-    return RecipeMapper.toDomain(entity);
+    return RecipeMapper.toDomain(entity, userId);
   }
 
   async create(createDto: CreateRecipeDto, creatorId?: number): Promise<Recipe> {
@@ -97,24 +99,30 @@ export class RecipesService {
     return RecipeMapper.toDomain(entity);
   }
 
-  async findAll(offset: number = 0, limit: number = 20): Promise<Recipe[]> {
+  async findAll(offset: number = 0, limit: number = 20, userId?: number): Promise<Recipe[]> {
     const entities = await this.recipeRepo.createQueryBuilder('recipe')
+      .leftJoinAndSelect('recipe.userRecipes', 'ur')
+      .leftJoinAndSelect('ur.user', 'u')
       .skip(offset)
       .take(limit)
       .orderBy('recipe.likesCount + recipe.commentsCount', 'DESC')
       .addOrderBy('recipe.createdAt', 'DESC')
       .getMany();
-    return RecipeMapper.toDomainList(entities);
-  }
-  async findByUserAndRole(userId: number, role: UserRecipeRole): Promise<Recipe[]> {
-    const entities = await this.recipeRepo.find({
-      where: { userRecipes: { userId, role } },
-    });
-    return RecipeMapper.toDomainList(entities);
+    return RecipeMapper.toDomainList(entities, userId);
   }
 
-  async search(name?: string, category?: string): Promise<Recipe[]> {
-    const qb = this.recipeRepo.createQueryBuilder('recipe');
+  async findByUserAndRole(targetUserId: number, role: UserRecipeRole, viewerId?: number): Promise<Recipe[]> {
+    const entities = await this.recipeRepo.find({
+      where: { userRecipes: { userId: targetUserId, role } },
+      relations: ['userRecipes', 'userRecipes.user']
+    });
+    return RecipeMapper.toDomainList(entities, viewerId);
+  }
+
+  async search(name?: string, category?: string, userId?: number): Promise<Recipe[]> {
+    const qb = this.recipeRepo.createQueryBuilder('recipe')
+      .leftJoinAndSelect('recipe.userRecipes', 'ur')
+      .leftJoinAndSelect('ur.user', 'u');
 
     if (name) {
       qb.andWhere('recipe.name LIKE :name', { name: `%${name}%` });
@@ -127,7 +135,7 @@ export class RecipesService {
     qb.orderBy('recipe.likesCount + recipe.commentsCount', 'DESC');
 
     const entities = await qb.getMany();
-    return RecipeMapper.toDomainList(entities);
+    return RecipeMapper.toDomainList(entities, userId);
   }
 
   async searchByIngredients(ingredients: string[]): Promise<Recipe[]> {
@@ -166,6 +174,7 @@ export class RecipesService {
     const qb = this.recipeRepo.createQueryBuilder('r')
       .leftJoinAndSelect('r.ingredients', 'ri')
       .leftJoinAndSelect('r.userRecipes', 'ur')
+      .leftJoinAndSelect('ur.user', 'u')
       .leftJoinAndSelect('ri.ingredient', 'i');
 
     if (badRecipeIds.length > 0) {
@@ -362,5 +371,37 @@ export class RecipesService {
     if (!isCreator) throw new ForbiddenException('You are not the creator of this recipe');
 
     await this.recipeRepo.remove(recipe);
+  }
+  async saveRecipe(id: number, userId: number, collection?: string): Promise<void> {
+    const recipe = await this.recipeRepo.findOneBy({ id });
+    if (!recipe) throw new NotFoundException('Recipe not found');
+
+    const criteria: any = { userId, recipeId: id, role: UserRecipeRole.SAVED };
+    if (collection) {
+      criteria.collection = collection;
+    } else {
+      criteria.collection = IsNull();
+    }
+
+    const existing = await this.userRecipeRepo.findOneBy(criteria);
+    if (existing) return;
+
+    const userRecipe = new UserRecipeEntity();
+    userRecipe.userId = userId;
+    userRecipe.recipeId = id;
+    userRecipe.role = UserRecipeRole.SAVED;
+    if (collection) userRecipe.collection = collection;
+
+    await this.userRecipeRepo.save(userRecipe);
+  }
+
+  async unsaveRecipe(id: number, userId: number, collection?: string): Promise<void> {
+    const criteria: any = { userId, recipeId: id, role: UserRecipeRole.SAVED };
+    if (collection) {
+      criteria.collection = collection;
+    } else {
+      criteria.collection = IsNull();
+    }
+    await this.userRecipeRepo.delete(criteria);
   }
 }

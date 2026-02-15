@@ -30,11 +30,8 @@ export class UsersController {
     private toResponse(user: User): UserResponseDto {
         return {
             id: user.id,
-            name: user.name,
-            username: user.username,
             email: user.email,
-            country: user.country,
-            avatar: user.avatar || null
+            language: user.language,
         };
     }
 }

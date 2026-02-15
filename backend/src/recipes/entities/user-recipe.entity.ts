@@ -19,6 +19,9 @@ export class UserRecipeEntity extends BaseEntity {
     })
     role: UserRecipeRole;
 
+    @Column({ name: 'collection', nullable: true, type: 'varchar' })
+    collection: string;
+
     @ManyToOne(() => RecipeEntity, (recipe) => recipe.userRecipes, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'recipe_id' })
     recipe: RecipeEntity;

@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
@@ -6,14 +8,32 @@ import styles from './RecipeDetailPage.module.css';
 
 export const RecipeDetailPage = observer(() => {
     const { id } = useParams<{ id: string }>();
-    const { recipesStore } = useStore();
+    const { recipesStore, authStore } = useStore();
     const { currentRecipe, currentRecipeComments, isLoading } = recipesStore;
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (id) {
             recipesStore.fetchRecipe(id);
         }
     }, [id, recipesStore]);
+
+    const handleSave = async () => {
+        if (!authStore.isAuthenticated) {
+            navigate('/login');
+            return;
+        }
+
+        if (currentRecipe) {
+            if (currentRecipe.isSaved) {
+                await recipesStore.unsaveRecipe(currentRecipe.id);
+                currentRecipe.isSaved = false;
+            } else {
+                await recipesStore.saveRecipe(currentRecipe.id);
+                currentRecipe.isSaved = true;
+            }
+        }
+    };
 
     if (isLoading) {
         return (
@@ -53,6 +73,13 @@ export const RecipeDetailPage = observer(() => {
                         </button>
                         <button className={styles.actionButton} title="Comment">
                             💬 {currentRecipe.commentsCount}
+                        </button>
+                        <button
+                            className={`${styles.actionButton} ${currentRecipe.isSaved ? styles.saved : ''}`}
+                            title={currentRecipe.isSaved ? "Unsave" : "Save"}
+                            onClick={handleSave}
+                        >
+                            {currentRecipe.isSaved ? <BookmarkCheck size={20} fill="#E11D48" className="text-primary" /> : <Bookmark size={20} />}
                         </button>
                     </div>
                 </div>

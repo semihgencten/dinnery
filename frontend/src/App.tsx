@@ -6,6 +6,11 @@ import { SignupPage } from './pages/auth/SignupPage';
 import { HomePage } from './pages/home/HomePage';
 import { RecipeDetailPage } from './pages/recipe/RecipeDetailPage';
 import { MainLayout } from './layouts/MainLayout';
+import { MyRecipesPage } from './pages/recipe/MyRecipesPage';
+import { CreateRecipePage } from './pages/recipe/CreateRecipePage';
+import { SearchPage } from './pages/search/SearchPage';
+import { SavedRecipesPage } from './pages/recipe/SavedRecipesPage';
+
 
 const App = observer(() => {
   const { authStore } = useStore();
@@ -28,7 +33,21 @@ const App = observer(() => {
     <MainLayout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route path="/recipes/:id" element={<RecipeDetailPage />} />
+        <Route
+          path="/my-recipes"
+          element={authStore.isAuthenticated ? <MyRecipesPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/saved"
+          element={authStore.isAuthenticated ? <SavedRecipesPage /> : <Navigate to="/login" />}
+        />
+
+        <Route
+          path="/create-recipe"
+          element={authStore.isAuthenticated ? <CreateRecipePage /> : <Navigate to="/login" />}
+        />
         <Route
           path="/login"
           element={!authStore.isAuthenticated ? <LoginPage /> : <Navigate to="/" />}

@@ -1,8 +1,12 @@
 import { RecipeEntity } from '../entities/recipe.entity';
 import { Recipe } from '../domain/recipe.model';
+import { UserRecipeRole } from '../domain/user-recipe.model';
 
 export class RecipeMapper {
-    static toDomain(entity: RecipeEntity): Recipe {
+    static toDomain(entity: RecipeEntity, currentUserId?: number): Recipe {
+        const creator = entity.userRecipes?.find(ur => ur.role === UserRecipeRole.CREATOR)?.user;
+        const isSaved = currentUserId ? entity.userRecipes?.some(ur => ur.userId === currentUserId && ur.role === UserRecipeRole.SAVED) || false : false;
+
         return new Recipe(
             entity.id,
             entity.name,
@@ -22,7 +26,9 @@ export class RecipeMapper {
                 quantity: Number(i.quantity),
                 unit: i.unit,
                 notes: i.notes
-            })) || null
+            })) || null,
+            creator ? { id: creator.id, username: creator.email.split('@')[0] } : null,
+            isSaved
         );
     }
 
@@ -39,7 +45,7 @@ export class RecipeMapper {
         };
     }
 
-    static toDomainList(entities: RecipeEntity[]): Recipe[] {
-        return entities.map(entity => this.toDomain(entity));
+    static toDomainList(entities: RecipeEntity[], currentUserId?: number): Recipe[] {
+        return entities.map(entity => this.toDomain(entity, currentUserId));
     }
 }

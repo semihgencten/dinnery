@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, Bookmark } from 'lucide-react';
+import { Search, Bookmark, ChefHat, PlusSquare, User } from 'lucide-react';
 import { useStore } from '../context/store.context';
 import { observer } from 'mobx-react-lite';
 import styles from './Header.module.css';
@@ -15,6 +15,7 @@ export const Header = observer(() => {
                     Dinnery
                 </Link>
 
+                {/* Desktop Navigation */}
                 <nav className={styles.nav}>
                     <Link to="/search" className={styles.navLink}>
                         <Search className={styles.icon} />
@@ -27,13 +28,35 @@ export const Header = observer(() => {
                     </Link>
 
                     {authStore.isAuthenticated ? (
-                        <button onClick={() => authStore.logout()} className={styles.loginBtn}>
-                            Logout
-                        </button>
+                        <div className={styles.userMenu}>
+                            <Link to="/create-recipe" className={styles.createBtn}>
+                                <PlusSquare className={styles.icon} />
+                                <span>Create Recipe</span>
+                            </Link>
+
+                            <Link to="/my-recipes" className={styles.navLink}>
+                                <ChefHat className={styles.icon} />
+                                <span className={styles.navText}>My Recipes</span>
+                            </Link>
+
+                            <Link to="/profile" className={styles.navLink}>
+                                <User className={styles.icon} />
+                                <span className={styles.navText}>Profile</span>
+                            </Link>
+
+                            <button onClick={() => authStore.logout()} className={styles.outlineBtn}>
+                                Logout
+                            </button>
+                        </div>
                     ) : (
-                        <button onClick={() => navigate('/login')} className={styles.loginBtn}>
-                            Login
-                        </button>
+                        <>
+                            <button onClick={() => navigate('/login')} className={styles.outlineBtn}>
+                                Login
+                            </button>
+                            <button onClick={() => navigate('/signup')} className={styles.loginBtn}>
+                                Sign Up
+                            </button>
+                        </>
                     )}
                 </nav>
             </div>

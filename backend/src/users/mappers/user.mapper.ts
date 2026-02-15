@@ -5,12 +5,9 @@ export class UserMapper {
     static toDomain(entity: UserEntity): User {
         return new User({
             id: entity.id,
-            name: entity.name,
-            username: entity.username,
             email: entity.email,
             password: entity.password, // Be careful mapping this back if we don't want to expose it
-            country: entity.country,
-            avatar: entity.avatar,
+            language: entity.language,
             createdAt: entity.createdAt,
             updatedAt: entity.updatedAt,
         });
@@ -18,12 +15,9 @@ export class UserMapper {
 
     static toEntity(domain: Partial<User>): Partial<UserEntity> {
         const entity: Partial<UserEntity> = {
-            name: domain.name,
-            username: domain.username,
             email: domain.email,
             password: domain.password,
-            country: domain.country,
-            avatar: domain.avatar ?? undefined,
+            language: domain.language,
         };
         return entity;
     }

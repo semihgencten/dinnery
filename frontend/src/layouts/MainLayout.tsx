@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
+import { MobileNav } from '../components/MobileNav';
 import styles from './MainLayout.module.css';
 
 interface MainLayoutProps {
@@ -14,6 +15,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             <main className={styles.main}>
                 {children}
             </main>
+            <MobileNav />
             <Footer />
         </div>
     );

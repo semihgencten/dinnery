@@ -19,6 +19,11 @@ export class Recipe {
             unit: string;
             notes: string | null;
         }[] | null = null,
+        public readonly author: {
+            id: number;
+            username: string;
+        } | null = null,
+        public readonly isSaved: boolean = false,
     ) { }
 
     static create(
