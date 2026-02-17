@@ -374,7 +374,7 @@ export class RecipesService {
 
     await this.recipeRepo.remove(recipe);
   }
-  async saveRecipe(id: number, userId: number, collection?: string): Promise<void> {
+  async saveRecipe(id: number, userId: number, collection?: string): Promise<Recipe> {
     const recipe = await this.recipeRepo.findOneBy({ id });
     if (!recipe) throw new NotFoundException('Recipe not found');
 
@@ -386,18 +386,20 @@ export class RecipesService {
     }
 
     const existing = await this.userRecipeRepo.findOneBy(criteria);
-    if (existing) return;
+    if (!existing) {
+      const userRecipe = new UserRecipeEntity();
+      userRecipe.userId = userId;
+      userRecipe.recipeId = id;
+      userRecipe.role = UserRecipeRole.SAVED;
+      if (collection) userRecipe.collection = collection;
 
-    const userRecipe = new UserRecipeEntity();
-    userRecipe.userId = userId;
-    userRecipe.recipeId = id;
-    userRecipe.role = UserRecipeRole.SAVED;
-    if (collection) userRecipe.collection = collection;
+      await this.userRecipeRepo.save(userRecipe);
+    }
 
-    await this.userRecipeRepo.save(userRecipe);
+    return this.findOne(id, userId);
   }
 
-  async unsaveRecipe(id: number, userId: number, collection?: string): Promise<void> {
+  async unsaveRecipe(id: number, userId: number, collection?: string): Promise<Recipe> {
     const criteria: any = { userId, recipeId: id, role: UserRecipeRole.SAVED };
     if (collection) {
       criteria.collection = collection;
@@ -405,5 +407,6 @@ export class RecipesService {
       criteria.collection = IsNull();
     }
     await this.userRecipeRepo.delete(criteria);
+    return this.findOne(id, userId);
   }
 }

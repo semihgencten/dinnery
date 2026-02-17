@@ -88,7 +88,7 @@ export class RecipesController {
     @Param('id', ParseIntPipe) id: number,
     @Body('collection') collection: string,
     @Req() req: any
-  ): Promise<void> {
+  ): Promise<Recipe> {
     return this.recipesService.saveRecipe(id, req.user.sub, collection);
   }
 
@@ -98,7 +98,7 @@ export class RecipesController {
     @Param('id', ParseIntPipe) id: number,
     @Query('collection') collection: string,
     @Req() req: any
-  ): Promise<void> {
+  ): Promise<Recipe> {
     return this.recipesService.unsaveRecipe(id, req.user.sub, collection);
   }
 

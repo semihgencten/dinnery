@@ -11,7 +11,7 @@ export const SavedRecipesPage = observer(() => {
         if (authStore.user) {
             recipesStore.fetchSavedRecipes(authStore.user.id);
         }
-    }, []);
+    }, [recipesStore.savedRecipes.length, authStore.user]);
 
     return (
         <div className={styles.container}>

@@ -116,6 +116,7 @@ describe('RecipesService', () => {
   describe('saveRecipe', () => {
     it('should save a recipe', async () => {
       repo.findOneBy = jest.fn().mockResolvedValue({ id: 1 }); // recipe exists
+      repo.findOne = jest.fn().mockResolvedValue({ id: 1, userRecipes: [], ingredients: [] }); // for this.findOne
       const userRecipeRepo = (service as any).userRecipeRepo;
       userRecipeRepo.findOneBy = jest.fn().mockResolvedValue(null); // not yet saved
       userRecipeRepo.save = jest.fn();
@@ -132,6 +133,7 @@ describe('RecipesService', () => {
 
     it('should not save if already saved', async () => {
       repo.findOneBy = jest.fn().mockResolvedValue({ id: 1 });
+      repo.findOne = jest.fn().mockResolvedValue({ id: 1, userRecipes: [{ userId: 1, role: UserRecipeRole.SAVED }], ingredients: [] }); // for this.findOne
       const userRecipeRepo = (service as any).userRecipeRepo;
       userRecipeRepo.findOneBy = jest.fn().mockResolvedValue({ id: 1 }); // already saved
 
@@ -143,6 +145,7 @@ describe('RecipesService', () => {
 
   describe('unsaveRecipe', () => {
     it('should unsave a recipe', async () => {
+      repo.findOne = jest.fn().mockResolvedValue({ id: 1, userRecipes: [], ingredients: [] }); // for this.findOne
       const userRecipeRepo = (service as any).userRecipeRepo;
       userRecipeRepo.delete = jest.fn();
 

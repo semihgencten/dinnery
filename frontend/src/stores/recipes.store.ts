@@ -207,7 +207,23 @@ export class RecipesStore {
 
     async saveRecipe(recipeId: number, collection?: string) {
         try {
-            await api.post(`/recipes/${recipeId}/save`, { collection });
+            const response = await api.post(`/recipes/${recipeId}/save`, { collection });
+            const savedRecipe = response.data;
+
+            runInAction(() => {
+                if (!this.savedRecipes.find(r => r.id === savedRecipe.id)) {
+                    this.savedRecipes.push(savedRecipe);
+                }
+
+                const recipeIndex = this.recipes.findIndex(r => r.id === recipeId);
+                if (recipeIndex !== -1) {
+                    this.recipes[recipeIndex] = savedRecipe;
+                }
+
+                if (this.currentRecipe && this.currentRecipe.id === recipeId) {
+                    this.currentRecipe = savedRecipe;
+                }
+            });
         } catch (error) {
             console.error('Failed to save recipe', error);
             throw error;
@@ -216,8 +232,22 @@ export class RecipesStore {
 
     async unsaveRecipe(recipeId: number, collection?: string) {
         try {
-            await api.delete(`/recipes/${recipeId}/save`, {
+            const response = await api.delete(`/recipes/${recipeId}/save`, {
                 params: { collection }
+            });
+            const updatedRecipe = response.data;
+
+            runInAction(() => {
+                this.savedRecipes = this.savedRecipes.filter(r => r.id !== recipeId);
+
+                const recipeIndex = this.recipes.findIndex(r => r.id === recipeId);
+                if (recipeIndex !== -1) {
+                    this.recipes[recipeIndex] = updatedRecipe;
+                }
+
+                if (this.currentRecipe && this.currentRecipe.id === recipeId) {
+                    this.currentRecipe = updatedRecipe;
+                }
             });
         } catch (error) {
             console.error('Failed to unsave recipe', error);
