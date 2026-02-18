@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/store.context';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import type { RegisterPayload } from '../../types/auth'; // Import updated type
 import styles from './Auth.module.scss';
 
 export const SignupPage = observer(() => {

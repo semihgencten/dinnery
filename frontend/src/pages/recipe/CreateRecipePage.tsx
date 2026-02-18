@@ -3,7 +3,7 @@ import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/store.context';
 import styles from './CreateRecipePage.module.scss';
-import type { CreateRecipePayload } from '../../stores/recipes.store';
+import type { CreateRecipePayload } from '../../types/recipe';
 
 interface IngredientRow {
     ingredientId?: number;

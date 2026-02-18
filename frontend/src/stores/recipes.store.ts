@@ -1,41 +1,10 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { api } from '../lib/axios';
+import { getRecipes, searchRecipes, getRecipe, getComments, getUserRecipes, createRecipe, searchIngredients, searchRecipesByIngredients, saveRecipe, unsaveRecipe } from '../api/recipeApi';
+import type { Recipe, Comment, CreateRecipePayload } from '../types/recipe';
 
-export interface Recipe {
-    id: number;
-    name: string;
-    description: string | null;
-    category: string | null;
-    instructions: string;
-    photoUrl: string | null;
-    cookTime: number | null;
-    prepTime: number | null;
-    likesCount: number;
-    commentsCount: number;
-    originalRecipeId: number | null;
-    createdAt: string;
-    updatedAt: string;
-    author?: {
-        id: number;
-        username: string;
-    };
-    ingredients?: {
-        name: string;
-        quantity: number;
-        unit: string;
-        notes: string | null;
-    }[];
-    isSaved: boolean;
-}
 
-export interface Comment {
-    id: number;
-    text: string;
-    userId: number;
-    recipeId: number;
-    createdAt: string;
-    updatedAt: string;
-}
+
+
 
 export class RecipesStore {
     recipes: Recipe[] = [];
@@ -51,16 +20,14 @@ export class RecipesStore {
     async fetchRecipes(offset = 0, limit = 20) {
         this.isLoading = true;
         try {
-            const response = await api.get('/recipes', {
-                params: { offset, limit }
-            });
+            const recipes = await getRecipes(offset, limit);
             runInAction(() => {
                 // For now, simpler implementation: replace recipes on load.
                 // If implementing infinite scroll later, we would append.
                 if (offset === 0) {
-                    this.recipes = response.data;
+                    this.recipes = recipes;
                 } else {
-                    this.recipes.push(...response.data);
+                    this.recipes.push(...recipes);
                 }
             });
         } catch (error) {
@@ -75,11 +42,9 @@ export class RecipesStore {
     async searchRecipes(name?: string, category?: string) {
         this.isLoading = true;
         try {
-            const response = await api.get('/recipes/search', {
-                params: { name, category }
-            });
+            const recipes = await searchRecipes(name, category);
             runInAction(() => {
-                this.recipes = response.data;
+                this.recipes = recipes;
             });
         } catch (error) {
             console.error('Failed to search recipes', error);
@@ -95,9 +60,9 @@ export class RecipesStore {
         this.currentRecipe = null;
         this.currentRecipeComments = [];
         try {
-            const response = await api.get(`/recipes/${id}`);
+            const recipe = await getRecipe(id);
             runInAction(() => {
-                this.currentRecipe = response.data;
+                this.currentRecipe = recipe;
             });
             // Fetch comments in parallel or after
             this.fetchComments(id);
@@ -112,9 +77,9 @@ export class RecipesStore {
 
     async fetchComments(id: string) {
         try {
-            const response = await api.get(`/recipes/${id}/comments`);
+            const comments = await getComments(id);
             runInAction(() => {
-                this.currentRecipeComments = response.data;
+                this.currentRecipeComments = comments;
             });
         } catch (error) {
             console.error(`Failed to fetch comments for recipe ${id}`, error);
@@ -124,11 +89,9 @@ export class RecipesStore {
     async fetchUserRecipes(userId: number) {
         this.isLoading = true;
         try {
-            const response = await api.get(`/recipes/user/${userId}`, {
-                params: { role: 'creator' }
-            });
+            const recipes = await getUserRecipes(userId, 'creator');
             runInAction(() => {
-                this.recipes = response.data;
+                this.recipes = recipes;
             });
         } catch (error) {
             console.error('Failed to fetch user recipes', error);
@@ -142,11 +105,11 @@ export class RecipesStore {
     async createRecipe(recipeData: CreateRecipePayload) {
         this.isLoading = true;
         try {
-            const response = await api.post('/recipes', recipeData);
+            const recipe = await createRecipe(recipeData);
             runInAction(() => {
-                this.recipes.unshift(response.data);
+                this.recipes.unshift(recipe);
             });
-            return response.data;
+            return recipe;
         } catch (error) {
             console.error('Failed to create recipe', error);
             throw error;
@@ -159,10 +122,7 @@ export class RecipesStore {
 
     async searchIngredients(term: string) {
         try {
-            const response = await api.get('/ingredients/search', {
-                params: { term }
-            });
-            return response.data;
+            return await searchIngredients(term);
         } catch (error) {
             console.error('Failed to search ingredients', error);
             return [];
@@ -172,11 +132,11 @@ export class RecipesStore {
     async searchRecipesByIngredients(ingredients: string[]) {
         this.isLoading = true;
         try {
-            const response = await api.post('/recipes/search/ingredients', ingredients);
+            const recipes = await searchRecipesByIngredients(ingredients);
             runInAction(() => {
-                this.recipes = response.data;
+                this.recipes = recipes;
             });
-            return response.data as Recipe[];
+            return recipes;
         } catch (error) {
             console.error('Failed to search recipes by ingredients', error);
             return [];
@@ -189,12 +149,10 @@ export class RecipesStore {
     async fetchSavedRecipes(userId: number, collection?: string) {
         this.isLoading = true;
         try {
-            const response = await api.get(`/recipes/user/${userId}`, {
-                params: { role: 'saved' }
-            });
+            const recipes = await getUserRecipes(userId, 'saved');
             // TODO: Filter by collection if needed, or backend should handle it
             runInAction(() => {
-                this.savedRecipes = response.data;
+                this.savedRecipes = recipes;
             });
         } catch (error) {
             console.error('Failed to fetch saved recipes', error);
@@ -207,8 +165,7 @@ export class RecipesStore {
 
     async saveRecipe(recipeId: number, collection?: string) {
         try {
-            const response = await api.post(`/recipes/${recipeId}/save`, { collection });
-            const savedRecipe = response.data;
+            const savedRecipe = await saveRecipe(recipeId, collection);
 
             runInAction(() => {
                 if (!this.savedRecipes.find(r => r.id === savedRecipe.id)) {
@@ -232,10 +189,7 @@ export class RecipesStore {
 
     async unsaveRecipe(recipeId: number, collection?: string) {
         try {
-            const response = await api.delete(`/recipes/${recipeId}/save`, {
-                params: { collection }
-            });
-            const updatedRecipe = response.data;
+            const updatedRecipe = await unsaveRecipe(recipeId, collection);
 
             runInAction(() => {
                 this.savedRecipes = this.savedRecipes.filter(r => r.id !== recipeId);
@@ -256,19 +210,4 @@ export class RecipesStore {
     }
 }
 
-export interface CreateRecipePayload {
-    name: string;
-    description?: string;
-    category?: string;
-    instructions: string;
-    photoUrl?: string;
-    cookTime?: number;
-    prepTime?: number;
-    ingredients: {
-        ingredientId?: number;
-        quantity: number;
-        unit: string;
-        customIngredientText?: string;
-        notes?: string;
-    }[];
-}
+

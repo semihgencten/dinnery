@@ -1,16 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx';
-import { api } from '../lib/axios';
-
-export interface User {
-    id: number;
-    email: string;
-    language: string;
-}
-
-interface LoginResponse {
-    accessToken: string;
-    refreshToken: string;
-}
+import { login, register, refreshToken } from '../api/authApi';
+import { getMe, updateMe } from '../api/userApi';
+import type { RegisterPayload } from '../types/auth';
+import type { User } from '../types/user';
 
 export class AuthStore {
     user: User | null = null;
@@ -50,10 +42,10 @@ export class AuthStore {
     async login(email: string, password: string) {
         this.isLoading = true;
         try {
-            const response = await api.post<LoginResponse>('/auth/login', { email, password });
+            const data = await login({ email, password });
             runInAction(() => {
-                this.setToken(response.data.accessToken);
-                this.setRefreshToken(response.data.refreshToken); // Store refresh token
+                this.setToken(data.accessToken);
+                this.setRefreshToken(data.refreshToken); // Store refresh token
                 this.isLoading = false;
             });
             await this.loadUser();
@@ -67,15 +59,14 @@ export class AuthStore {
         }
     }
 
-    async register(data: any) {
+    async register(data: RegisterPayload) {
         this.isLoading = true;
         try {
             // Register usually returns the user or just success. 
             // Based on controller it returns UserResponseDto.
             // We might want to auto-login or ask user to login. 
             // For now, let's just return the response.
-            const response = await api.post('/auth/register', data);
-            return response.data;
+            await register(data);
         } catch (error) {
             console.error('Registration failed', error);
             throw error;
@@ -89,9 +80,9 @@ export class AuthStore {
     async loadUser() {
         this.isLoading = true;
         try {
-            const response = await api.get<User>('/users/me');
+            const user = await getMe();
             runInAction(() => {
-                this.user = response.data;
+                this.user = user;
             });
         } catch (error) {
             console.error('Load user failed', error);
@@ -106,9 +97,9 @@ export class AuthStore {
 
     async updateProfile(data: { language?: string }) {
         try {
-            const response = await api.patch<User>('/users/me', data);
+            const user = await updateMe(data);
             runInAction(() => {
-                this.user = response.data;
+                this.user = user;
             });
         } catch (error) {
             console.error('Update profile failed', error);
@@ -129,16 +120,14 @@ export class AuthStore {
         }
 
         try {
-            const response = await api.post<{ accessToken: string }>('/auth/refresh', {
-                refreshToken: this.refreshToken,
-            });
+            const data = await refreshToken(this.refreshToken);
 
             runInAction(() => {
-                this.setToken(response.data.accessToken);
+                this.setToken(data.accessToken);
                 // Currently backend doesn't return new refresh token, but if it did, update it here
             });
 
-            return response.data.accessToken;
+            return data.accessToken;
         } catch (error) {
             console.error('Refresh token failed', error);
             this.logout();

@@ -1,13 +1,14 @@
 import axios from 'axios';
 
-export const api = axios.create({
+export const axiosClient = axios.create({
     baseURL: 'http://localhost:3000',
+    timeout: 5000,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-api.interceptors.request.use((config) => {
+axiosClient.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -15,10 +16,8 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-export default api;
-
 export const setupInterceptors = (store: any) => {
-    api.interceptors.response.use(
+    axiosClient.interceptors.response.use(
         (response) => response,
         async (error) => {
             const originalRequest = error.config;
@@ -34,7 +33,7 @@ export const setupInterceptors = (store: any) => {
                     const accessToken = await store.authStore.refreshAccessToken();
                     // Update header with new token
                     originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-                    return api(originalRequest);
+                    return axiosClient(originalRequest);
                 } catch (refreshError) {
                     // Refresh failed (e.g. refresh token expired), user is already logged out by store
                     return Promise.reject(refreshError);
