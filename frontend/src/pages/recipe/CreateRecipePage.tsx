@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../../context/store.context';
 import styles from './CreateRecipePage.module.scss';
 import type { CreateRecipePayload } from '../../types/recipe';
+import { getCloudinarySignature, uploadPhotoToCloudinary } from '../../api/photoClient';
 
 interface IngredientRow {
     ingredientId?: number;
@@ -33,6 +34,34 @@ export const CreateRecipePage = observer(() => {
 
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [activeSearchIndex, setActiveSearchIndex] = useState<number | null>(null);
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+
+    const handlePhotoUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+        console.log(`[CreateRecipePage] handlePhotoUpload triggered. Files array:`, e.target.files);
+        const file = e.target.files?.[0];
+        if (!file) {
+            console.warn(`[CreateRecipePage] Upload aborted - no file selected.`);
+            return;
+        }
+
+        console.log(`[CreateRecipePage] Started upload process for file: ${file.name}`);
+        setIsUploadingPhoto(true);
+        try {
+            const signatureData = await getCloudinarySignature();
+            console.log(`[CreateRecipePage] Received Cloudinary signature successfully:`, signatureData);
+            const secureUrl = await uploadPhotoToCloudinary(file, signatureData);
+
+            console.log(`[CreateRecipePage] Upload completed - storing secure URL in formData`);
+            setFormData(prev => ({ ...prev, photoUrl: secureUrl }));
+        } catch (error) {
+            console.error('Error uploading photo:', error);
+            alert('Failed to upload photo. Please try again.');
+        } finally {
+            setIsUploadingPhoto(false);
+            // reset file input
+            if (e.target) e.target.value = '';
+        }
+    };
 
     const handleInputChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -172,16 +201,43 @@ export const CreateRecipePage = observer(() => {
                             </select>
                         </div>
                         <div className={`${styles.formGroup} ${styles.col}`}>
-                            <label className={styles.label} htmlFor="photoUrl">Photo URL</label>
-                            <input
-                                type="url"
-                                id="photoUrl"
-                                name="photoUrl"
-                                className={styles.input}
-                                value={formData.photoUrl}
-                                onChange={handleInputChange}
-                                placeholder="https://example.com/image.jpg"
-                            />
+                            <label className={styles.label} htmlFor="photoUrl">Photo</label>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <input
+                                    type="url"
+                                    id="photoUrl"
+                                    name="photoUrl"
+                                    className={styles.input}
+                                    value={formData.photoUrl}
+                                    onChange={handleInputChange}
+                                    placeholder="https://example.com/image.jpg"
+                                    style={{ flex: 1, margin: 0 }}
+                                />
+                                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>or</span>
+                                <label
+                                    htmlFor="photoUpload"
+                                    style={{
+                                        cursor: isUploadingPhoto ? 'wait' : 'pointer',
+                                        padding: '0.6rem 1rem',
+                                        backgroundColor: 'var(--surface-mixed)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: 'var(--radius-md)',
+                                        fontSize: '14px',
+                                        whiteSpace: 'nowrap',
+                                        opacity: isUploadingPhoto ? 0.7 : 1
+                                    }}
+                                >
+                                    {isUploadingPhoto ? 'Uploading...' : 'Upload File'}
+                                </label>
+                                <input
+                                    type="file"
+                                    id="photoUpload"
+                                    accept="image/*"
+                                    onChange={handlePhotoUpload}
+                                    disabled={isUploadingPhoto}
+                                    style={{ display: 'none' }}
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -317,8 +373,8 @@ export const CreateRecipePage = observer(() => {
                     </div>
                 </div>
 
-                <button type="submit" className={styles.submitButton} disabled={recipesStore.isLoading}>
-                    {recipesStore.isLoading ? 'Creating...' : 'Create Recipe'}
+                <button type="submit" className={styles.submitButton} disabled={recipesStore.isLoading || isUploadingPhoto}>
+                    {recipesStore.isLoading ? 'Creating...' : (isUploadingPhoto ? 'Uploading Photo...' : 'Create Recipe')}
                 </button>
             </form>
         </div>

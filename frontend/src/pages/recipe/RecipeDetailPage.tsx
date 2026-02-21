@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { Bookmark, BookmarkCheck, Heart, MessageCircle, Tag, Clock, Flame, CalendarDays, List, ChefHat } from 'lucide-react';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
@@ -44,12 +44,9 @@ export const RecipeDetailPage = observer(() => {
     }
 
     if (!currentRecipe) {
-        // Optionally could show a "Not Found" UI or redirect
-        // For now, if loading finished and no recipe, imply not found or error
         return <div className={styles.container}>Recipe not found</div>;
     }
 
-    // Split instructions by newlines for step-by-step display
     const instructionSteps = currentRecipe.instructions
         ? currentRecipe.instructions.split('\n').filter(step => step.trim().length > 0)
         : [];
@@ -69,17 +66,17 @@ export const RecipeDetailPage = observer(() => {
                     <h1 className={styles.title}>{currentRecipe.name}</h1>
                     <div className={styles.actions}>
                         <button className={styles.actionButton} title="Like">
-                            ❤️ {currentRecipe.likesCount}
+                            <Heart size={18} /> <span>{currentRecipe.likesCount}</span>
                         </button>
                         <button className={styles.actionButton} title="Comment">
-                            💬 {currentRecipe.commentsCount}
+                            <MessageCircle size={18} /> <span>{currentRecipe.commentsCount}</span>
                         </button>
                         <button
                             className={`${styles.actionButton} ${currentRecipe.isSaved ? styles.saved : ''}`}
                             title={currentRecipe.isSaved ? "Unsave" : "Save"}
                             onClick={handleSave}
                         >
-                            {currentRecipe.isSaved ? <BookmarkCheck size={20} fill="#E11D48" className="text-primary" /> : <Bookmark size={20} />}
+                            {currentRecipe.isSaved ? <BookmarkCheck size={18} fill="#E11D48" className="text-primary" /> : <Bookmark size={18} />}
                         </button>
                     </div>
                 </div>
@@ -87,34 +84,39 @@ export const RecipeDetailPage = observer(() => {
                 <div className={styles.metaInfo}>
                     {currentRecipe.category && (
                         <div className={styles.metaItem}>
-                            🏷️ {currentRecipe.category}
+                            <Tag size={16} /> <span>{currentRecipe.category}</span>
                         </div>
                     )}
                     {currentRecipe.prepTime && (
                         <div className={styles.metaItem}>
-                            ⏱️ Prep: {currentRecipe.prepTime} min
+                            <Clock size={16} /> <span>Prep: {currentRecipe.prepTime} min</span>
                         </div>
                     )}
                     {currentRecipe.cookTime && (
                         <div className={styles.metaItem}>
-                            🍳 Cook: {currentRecipe.cookTime} min
+                            <Flame size={16} /> <span>Cook: {currentRecipe.cookTime} min</span>
                         </div>
                     )}
                     <div className={styles.metaItem}>
-                        📅 {new Date(currentRecipe.createdAt).toLocaleDateString()}
+                        <CalendarDays size={16} /> <span>{new Date(currentRecipe.createdAt).toLocaleDateString()}</span>
                     </div>
                 </div>
             </div>
 
             <div className={styles.contentGrid}>
                 <aside className={styles.ingredients}>
-                    <h2 className={styles.sectionTitle}>Ingredients</h2>
+                    <h2 className={styles.sectionTitle}>
+                        <List size={24} color="var(--primary-color)" /> Ingredients
+                    </h2>
                     {currentRecipe.ingredients && currentRecipe.ingredients.length > 0 ? (
                         <ul className={styles.ingredientList}>
                             {currentRecipe.ingredients.map((ing, index) => (
                                 <li key={index} className={styles.ingredientItem}>
-                                    <strong>{ing.quantity} {ing.unit}</strong> {ing.name}
-                                    {ing.notes && <em style={{ fontSize: '0.85em', color: 'var(--text-muted)' }}> ({ing.notes})</em>}
+                                    <span className={styles.ingredientQuantity}>{ing.quantity} {ing.unit}</span>
+                                    <span>
+                                        {ing.name}
+                                        {ing.notes && <em style={{ fontSize: '0.85em', color: 'var(--text-muted)' }}> ({ing.notes})</em>}
+                                    </span>
                                 </li>
                             ))}
                         </ul>
@@ -124,11 +126,13 @@ export const RecipeDetailPage = observer(() => {
                 </aside>
 
                 <div className={styles.instructions}>
-                    <h2 className={styles.sectionTitle}>Instructions</h2>
+                    <h2 className={styles.sectionTitle}>
+                        <ChefHat size={24} color="var(--primary-color)" /> Instructions
+                    </h2>
                     {instructionSteps.length > 0 ? instructionSteps.map((step, index) => (
                         <div key={index} className={styles.instructionStep}>
                             <div className={styles.stepNumber}>{index + 1}</div>
-                            <div style={{ paddingTop: '0.25rem' }}>{step}</div>
+                            <div className={styles.stepContent}>{step}</div>
                         </div>
                     )) : (
                         <p>No instructions provided.</p>
@@ -136,13 +140,15 @@ export const RecipeDetailPage = observer(() => {
                 </div>
 
                 <div className={styles.commentsSection}>
-                    <h2 className={styles.sectionTitle}>Comments ({currentRecipe?.commentsCount || 0})</h2>
+                    <h2 className={styles.sectionTitle}>
+                        <MessageCircle size={24} color="var(--primary-color)" /> Comments ({currentRecipe?.commentsCount || 0})
+                    </h2>
                     {currentRecipeComments.length > 0 ? (
                         <div className={styles.commentList}>
                             {currentRecipeComments.map(comment => (
                                 <div key={comment.id} className={styles.comment}>
                                     <div className={styles.commentHeader}>
-                                        <span>User #{comment.userId}</span>
+                                        <span className={styles.commentUser}>User #{comment.userId}</span>
                                         <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
                                     </div>
                                     <div className={styles.commentText}>{comment.text}</div>
