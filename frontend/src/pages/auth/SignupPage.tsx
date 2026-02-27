@@ -11,7 +11,7 @@ export const SignupPage = observer(() => {
     const { authStore } = useStore();
     const navigate = useNavigate();
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<RegisterPayload>({
         email: '',
         password: '',
         language: 'en',

@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import { useStore } from '../context/store.context';
 import { type Recipe } from '../types/recipe';
-import { Clock, Heart, MessageCircle, ChefHat, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Clock, Heart, ChefHat, Bookmark, BookmarkCheck } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import './RecipeCard.scss';
 
