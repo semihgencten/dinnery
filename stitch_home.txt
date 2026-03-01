@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ec13",
+                        "background-light": "#f6f8f6",
+                        "background-dark": "#102210",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+<!-- Header Section -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border-2 border-primary">
+<img class="w-full h-full object-cover" data-alt="User profile avatar of a smiling man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwU2bN0ieMOJrV3fdict8-4vUhfSzs3xO-ZQPeFD-0rA5AHDP_xZpTIUaRLtMO_b4-GALuHeYuyLo_x47SWQo6QnSpYwaZPf4Ho4q0AtX4cUUnCzC2shZYcfX5JUkvCrlnKVXMOZY_khESgRSIHNs6eaT-Lfj6N8IOr3MEOh-_q-6WKisTEQevwxKGp8wEjSildNtIJejhomeBrQhsn5atFRPEz-Eb4qaPcbZbs65X5kPSzrNbGiucu2wffw3m-UGL4RfiTqNfDgs"/>
+</div>
+<div>
+<p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Welcome back</p>
+<h1 class="text-lg font-bold leading-none">Good morning, Alex</h1>
+</div>
+</div>
+<button class="size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center text-slate-700 dark:text-slate-200 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-primary rounded-full border-2 border-white dark:border-slate-800"></span>
+</button>
+</header>
+<main class="pb-24">
+<!-- Search Bar Accent -->
+<div class="px-6 mb-8">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-12 pr-4 py-4 rounded-xl border-none bg-white dark:bg-slate-800 shadow-sm focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Search recipes, chefs, or ingredients" type="text"/>
+</div>
+</div>
+<!-- Trending Section -->
+<section class="mb-8">
+<div class="flex items-center justify-between px-6 mb-4">
+<h2 class="text-xl font-bold tracking-tight">Trending Today</h2>
+<a class="text-primary text-sm font-semibold" href="#">See all</a>
+</div>
+<div class="flex overflow-x-auto gap-5 px-6 no-scrollbar snap-x snap-mandatory">
+<!-- Trending Card 1 -->
+<div class="min-w-[85vw] md:min-w-[400px] snap-center">
+<div class="relative h-64 rounded-xl overflow-hidden shadow-lg group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Gourmet creamy garlic pasta with herbs" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBeG03ElEC_MDqLH7LA_DWmUOVOAfvFxYgpkdojF_upaJHGHrsMcb-jOSNi_7kBqgCDGFwYMwbcKRFeJVg23L3n1XhZkTL7jCcZ6zY6XsG0c3GCkR-ilHbWCt_O7dLLwORnacLLuh7rx28J--eOUc6ut7qAhSL3Yu2ZBy4bEYylG681TW6uZ3Q175WZTwcBx9jGiKLlsB8C5AlyAAjW25SZk5GmHO0Sv-G0JIHntHgkGw63pezl1Tq7DpE4dZ-YCsiRGmbJh3l4WnM');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-5 w-full">
+<div class="flex gap-2 mb-2">
+<span class="px-2 py-1 rounded bg-primary text-background-dark text-[10px] font-bold uppercase tracking-wider">Fast &amp; Easy</span>
+<span class="px-2 py-1 rounded bg-white/20 backdrop-blur-md text-white text-[10px] font-bold uppercase tracking-wider">Top Rated</span>
+</div>
+<h3 class="text-white text-xl font-bold mb-1">Creamy Garlic Pasta</h3>
+<div class="flex items-center justify-between text-white/90 text-sm">
+<span class="flex items-center gap-1">Chef Mario <span class="text-primary">•</span> 4.8★</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 20 mins</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Trending Card 2 -->
+<div class="min-w-[85vw] md:min-w-[400px] snap-center">
+<div class="relative h-64 rounded-xl overflow-hidden shadow-lg group">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110" data-alt="Spicy red Thai curry in a bowl" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAYRnc9ZTu4pxH17GVM20nI2QzOwhY-mvnRb7JEulkT4PXQ5arJcFqZcQLAN94r5HGbPxn-qdE42yAi3F9UVFy74TI_Wf207RyvpQDBgR6q92ZM4zsa6VIE6VYqF8-Sn1xCisK7wdWlkyz-y1IIv3Ey9DwjXjpCzhNDUjmIym_Z14rdVOc5EjPDG7mz0m-bxduUX8uSNUeSFjnKjdS3sbWaxruZ20YZegCShd04TIo4s32EbCJaXmpTccsRld5UwY6Tl3wp46aGBYc');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-5 w-full">
+<div class="flex gap-2 mb-2">
+<span class="px-2 py-1 rounded bg-primary text-background-dark text-[10px] font-bold uppercase tracking-wider">Authentic</span>
+</div>
+<h3 class="text-white text-xl font-bold mb-1">Spicy Thai Curry</h3>
+<div class="flex items-center justify-between text-white/90 text-sm">
+<span class="flex items-center gap-1">Sarah Jenkins <span class="text-primary">•</span> 4.9★</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 35 mins</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recommended Feed -->
+<section class="px-6">
+<h2 class="text-xl font-bold tracking-tight mb-4">Recommended for You</h2>
+<div class="space-y-4">
+<!-- Recommended Item 1 -->
+<div class="bg-white dark:bg-slate-800 rounded-lg p-3 flex gap-4 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="size-24 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Grilled salmon salad with avocado" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYd92xMt_TDUkXJ0x1DIUnBL8lMky6FanqJtTg8ZAM5Fbh80GSA6pQegAZpZ6WYrsxu5bXFD8n14Z4ioPvZZBYpy6PvHeGhBtMT9mWNecMZOBXxNToVBO3zzWVrgs8VJcbATGPM1WMKwDT-mcGuFeACdZxtSMzTkbVEZbEPhraxyiT5IpqC-rNYHdUJhLItGMmU-7PQmlRH7T4eDVoFdqgZYZRhB90rE1yYmCJV6_xMv2MOuhe2aLkMwi6CySGTS6UTcsx7xR4s_U"/>
+</div>
+<div class="flex flex-col justify-between py-1 flex-1">
+<div>
+<h4 class="font-bold text-base leading-tight">Grilled Salmon Salad</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">HealthyEats • 15 mins</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold ml-1">4.7</span>
+</div>
+<button class="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Recommended Item 2 -->
+<div class="bg-white dark:bg-slate-800 rounded-lg p-3 flex gap-4 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="size-24 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Colorful mediterranean bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5vk5fOVTtHaUBRi74oPsHBOIg20c9KIBWeIhdSN4P5JrrjJQHpqflEsF7rQzBESp6-DyQkkXqVT1vJZfOFH0mztxL-MSFWQN8cxgv3ALj0hxye8JaADdINO3BAOvs61hmNszElIMO7BsaisamU-rliud4xa7YfgbCBsZrMwb_1oMnZHKcx-GnvRJV9f9CNmfaf_PzSHiZ6WyaAs_ZiHDKwUf9R3t2f9O4lE3wt4DdkeVN-7xG-rXqLQ4yjJuPd1ypWO-kamrHc1s"/>
+</div>
+<div class="flex flex-col justify-between py-1 flex-1">
+<div>
+<h4 class="font-bold text-base leading-tight">Mediterranean Bowl</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">GreenKitchen • 10 mins</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold ml-1">4.9</span>
+</div>
+<button class="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Recommended Item 3 -->
+<div class="bg-white dark:bg-slate-800 rounded-lg p-3 flex gap-4 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="size-24 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Homemade artisan pizza" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmWoEzkfpVi-QzcvggmcGERwCntwehdxxJqEPP3uLgu41S5hqQJxKBErPKOwe5j13q2EM5kqK1XV4334QHF1xaqjy3--xt1_brwEDKQIQK93Lktn4zSQYIubjmeJN-eIyxCpVQC2Wa8KneHyeLop8K4F-7tyW4IujSh-omjg6n3zj_3Qm_LeYrCwZ17GmSIzRayRThSIrGO31zQYLwumeXQSBz_aLUSxtJDKlPKz9JoLqFuPG8xDXL5ozBDglUGlCVb22sVle-_Tk"/>
+</div>
+<div class="flex flex-col justify-between py-1 flex-1">
+<div>
+<h4 class="font-bold text-base leading-tight">Artisan Pepperoni Pizza</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Chef Luigi • 45 mins</p>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center text-primary">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold ml-1">4.5</span>
+</div>
+<button class="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-6 pb-6 pt-3 z-50">
+<div class="flex items-center justify-between max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="text-[10px] font-medium">Search</span>
+</a>
+<a class="flex flex-col items-center -mt-8" href="#">
+<div class="size-14 rounded-full bg-primary shadow-lg shadow-primary/40 flex items-center justify-center text-background-dark border-4 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+<span class="text-[10px] font-medium mt-1 text-slate-400">Create</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-medium">Browse</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>
