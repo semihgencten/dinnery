@@ -1,0 +1,177 @@
+import { StyleSheet } from 'react-native';
+import { theme } from '../../theme/colors';
+
+export const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: theme.colors.backgroundLight,
+    },
+    header: {
+        paddingTop: 48,
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: theme.colors.white,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(19, 236, 19, 0.1)',
+    },
+    iconButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: theme.colors.textDark,
+    },
+    content: {
+        padding: 16,
+        paddingBottom: 120, // Leave room for bottom nav
+    },
+    photoContainer: {
+        marginBottom: 24,
+    },
+    photoUpload: {
+        width: '100%',
+        aspectRatio: 16 / 9,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderStyle: 'dashed',
+        borderColor: 'rgba(19, 236, 19, 0.2)',
+        backgroundColor: 'rgba(19, 236, 19, 0.05)',
+        overflow: 'hidden',
+    },
+    photoOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    photoText: {
+        color: theme.colors.white,
+        fontWeight: '600',
+        fontSize: 12,
+        marginTop: 8,
+        letterSpacing: 1,
+    },
+    section: {
+        marginBottom: 32,
+    },
+    label: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: theme.colors.textLight,
+        marginBottom: 8,
+        letterSpacing: 1,
+    },
+    input: {
+        backgroundColor: theme.colors.white,
+        borderWidth: 1,
+        borderColor: 'rgba(19, 236, 19, 0.1)',
+        borderRadius: 12,
+        padding: 16,
+        fontSize: 16,
+        color: theme.colors.textDark,
+        fontWeight: '500',
+    },
+    textArea: {
+        height: 100,
+        textAlignVertical: 'top',
+    },
+    row: {
+        flexDirection: 'row',
+        marginTop: 16,
+    },
+    inputWithIcon: {
+        position: 'relative',
+        backgroundColor: theme.colors.white,
+        borderWidth: 1,
+        borderColor: 'rgba(19, 236, 19, 0.1)',
+        borderRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    inputIcon: {
+        paddingLeft: 12,
+    },
+    inputVal: {
+        flex: 1,
+        padding: 16,
+        paddingLeft: 8,
+        fontSize: 16,
+        color: theme.colors.textDark,
+    },
+    sectionHeaderRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: theme.colors.textDark,
+        marginLeft: 8,
+    },
+    listItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    listInput: {
+        flex: 1,
+        backgroundColor: theme.colors.white,
+        borderWidth: 1,
+        borderColor: 'rgba(19, 236, 19, 0.1)',
+        borderRadius: 12,
+        padding: 16,
+        fontSize: 16,
+    },
+    deleteBtn: {
+        padding: 16,
+    },
+    addButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderStyle: 'dashed',
+        borderColor: 'rgba(19, 236, 19, 0.2)',
+        marginTop: 8,
+    },
+    addButtonText: {
+        color: theme.colors.primary,
+        fontWeight: '600',
+        fontSize: 16,
+        marginLeft: 8,
+    },
+    instructionItem: {
+        flexDirection: 'row',
+        marginBottom: 16,
+    },
+    stepCircle: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: theme.colors.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 12,
+        marginTop: 8,
+    },
+    stepText: {
+        color: theme.colors.white,
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    instructionInput: {
+        minHeight: 100,
+        textAlignVertical: 'top',
+    },
+});
