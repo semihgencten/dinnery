@@ -5,13 +5,13 @@ import { RecipeEntity } from './entities/recipe.entity';
 import { RecipeIngredientEntity } from './entities/recipe-ingredient.entity';
 import { Recipe } from './domain/recipe.model';
 import { RecipeMapper } from './mappers/recipe.mapper';
-import { CreateRecipeDto, UpdateRecipeDto } from './dtos/recipe.dto';
+import { RecipeCreateRequestDto, RecipeUpdateRequestDto } from './dtos/recipe.dto';
 import { UserRecipeEntity } from './entities/user-recipe.entity';
 import { UserRecipeRole } from './domain/user-recipe.model';
 import { RecipeLikeEntity } from './entities/recipe-like.entity';
 import { CommentEntity } from './entities/comment.entity';
 import { Comment } from './domain/comment.model';
-import { CreateCommentDto } from './dtos/comment.dto';
+import { RecipeAddCommentRequestDto } from './dtos/comment.dto';
 
 @Injectable()
 export class RecipesService {
@@ -40,7 +40,7 @@ export class RecipesService {
     return RecipeMapper.toDomain(entity, userId);
   }
 
-  async create(createDto: CreateRecipeDto, creatorId?: number): Promise<Recipe> {
+  async create(createDto: RecipeCreateRequestDto, creatorId?: number): Promise<Recipe> {
     const domainData = Recipe.create(
       createDto.name,
       createDto.description ?? '',
@@ -285,7 +285,7 @@ export class RecipesService {
     return { liked, likesCount: updatedRecipe?.likesCount || 0 };
   }
 
-  async addComment(recipeId: number, userId: number, createDto: CreateCommentDto): Promise<Comment> {
+  async addComment(recipeId: number, userId: number, createDto: RecipeAddCommentRequestDto): Promise<Comment> {
     const recipe = await this.recipeRepo.findOneBy({ id: recipeId });
     if (!recipe) throw new NotFoundException('Recipe not found');
 
@@ -326,7 +326,7 @@ export class RecipesService {
       e.updatedAt
     ));
   }
-  async update(id: number, updateDto: UpdateRecipeDto, userId: number): Promise<Recipe> {
+  async update(id: number, updateDto: RecipeUpdateRequestDto, userId: number): Promise<Recipe> {
     const recipe = await this.recipeRepo.findOne({
       where: { id },
       relations: ['userRecipes', 'ingredients']
@@ -410,3 +410,4 @@ export class RecipesService {
     return this.findOne(id, userId);
   }
 }
+

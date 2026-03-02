@@ -34,7 +34,7 @@ export class UserRecipeDto {
     role: UserRecipeRole;
 }
 
-export class CreateRecipeDto {
+export class RecipeCreateRequestDto {
     @IsString()
     @IsNotEmpty()
     name: string;
@@ -80,9 +80,20 @@ export class CreateRecipeDto {
     userRecipes: UserRecipeDto[];
 }
 
-export class UpdateRecipeDto extends PartialType(CreateRecipeDto) { }
+export class RecipeUpdateRequestDto extends PartialType(RecipeCreateRequestDto) { }
 
-export class RecipeResponseDto {
+export class RecipeSearchByIngredientsRequestDto {
+    @IsArray()
+    @IsString({ each: true })
+    ingredients: string[];
+}
+
+export class RecipeSaveRequestDto {
+    @IsString()
+    collection: string;
+}
+
+export class RecipeBaseResponseDto {
     id: number;
     name: string;
     description: string | null;
@@ -94,4 +105,34 @@ export class RecipeResponseDto {
     originalRecipeId: number | null;
     createdAt: Date;
     updatedAt: Date;
+    ingredients?: {
+        name: string;
+        quantity: number;
+        unit: string;
+        notes: string | null;
+    }[] | null;
+    author?: {
+        id: number;
+        username: string;
+    } | null;
+    isSaved?: boolean;
+    likesCount?: number;
+    commentsCount?: number;
 }
+
+export class RecipeCreateResponseDto extends RecipeBaseResponseDto { }
+export class RecipeGetAllResponseDto extends RecipeBaseResponseDto { }
+export class RecipeSearchResponseDto extends RecipeBaseResponseDto { }
+export class RecipeSearchByIngredientsResponseDto extends RecipeBaseResponseDto { }
+export class RecipeGetByUserResponseDto extends RecipeBaseResponseDto { }
+export class RecipeGetResponseDto extends RecipeBaseResponseDto { }
+export class RecipeUpdateResponseDto extends RecipeBaseResponseDto { }
+export class RecipeForkResponseDto extends RecipeBaseResponseDto { }
+export class RecipeSaveResponseDto extends RecipeBaseResponseDto { }
+export class RecipeUnsaveResponseDto extends RecipeBaseResponseDto { }
+
+export class RecipeToggleLikeResponseDto {
+    liked: boolean;
+    likesCount: number;
+}
+

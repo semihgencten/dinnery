@@ -1,13 +1,18 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { IngredientsService } from './ingredients.service';
-import { CreateIngredientDto, IngredientResponseDto } from './dtos/ingredient.dto';
+import {
+    IngredientCreateRequestDto,
+    IngredientCreateResponseDto,
+    IngredientSearchResponseDto,
+    IngredientGetResponseDto
+} from './dtos/ingredient.dto';
 
 @Controller('ingredients')
 export class IngredientsController {
     constructor(private readonly ingredientsService: IngredientsService) { }
 
     @Post()
-    async create(@Body() createDto: CreateIngredientDto): Promise<IngredientResponseDto> {
+    async create(@Body() createDto: IngredientCreateRequestDto): Promise<IngredientCreateResponseDto> {
         const ingredient = await this.ingredientsService.create(createDto);
         return {
             id: ingredient.id,
@@ -20,7 +25,7 @@ export class IngredientsController {
     }
 
     @Get('search')
-    async search(@Query('term') term: string): Promise<IngredientResponseDto[]> {
+    async search(@Query('term') term: string): Promise<IngredientSearchResponseDto[]> {
         const ingredients = await this.ingredientsService.search(term);
         return ingredients.map(ingredient => ({
             id: ingredient.id,
@@ -33,7 +38,7 @@ export class IngredientsController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: number): Promise<IngredientResponseDto> {
+    async findOne(@Param('id') id: number): Promise<IngredientGetResponseDto> {
         const ingredient = await this.ingredientsService.findOne(id);
 
         return {
@@ -46,3 +51,4 @@ export class IngredientsController {
         };
     }
 }
+

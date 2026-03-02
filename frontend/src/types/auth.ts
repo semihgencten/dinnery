@@ -1,15 +1,5 @@
-export interface LoginResponse {
-    accessToken: string;
-    refreshToken: string;
-}
+import type { UserLoginRequestDto, UserLoginResponseDto, UserRegisterRequestDto } from "../../../shared/api-types";
 
-export interface LoginPayload {
-    email: string;
-    password: string;
-}
-
-export interface RegisterPayload {
-    email: string;
-    password: string;
-    language?: string;
-}
+export type LoginResponse = UserLoginResponseDto;
+export type LoginPayload = UserLoginRequestDto;
+export type RegisterPayload = UserRegisterRequestDto;

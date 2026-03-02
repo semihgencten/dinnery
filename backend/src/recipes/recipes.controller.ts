@@ -1,11 +1,29 @@
 import { Body, Controller, Get, Param, Post, Query, Req, UseGuards, ParseIntPipe, Patch, Delete, HttpCode } from '@nestjs/common';
 import { RecipesService } from './recipes.service';
-import { Recipe } from './domain/recipe.model';
-import { CreateRecipeDto, UpdateRecipeDto } from './dtos/recipe.dto';
+import {
+  RecipeCreateRequestDto,
+  RecipeUpdateRequestDto,
+  RecipeCreateResponseDto,
+  RecipeGetAllResponseDto,
+  RecipeSearchResponseDto,
+  RecipeSearchByIngredientsRequestDto,
+  RecipeSearchByIngredientsResponseDto,
+  RecipeGetByUserResponseDto,
+  RecipeGetResponseDto,
+  RecipeUpdateResponseDto,
+  RecipeForkResponseDto,
+  RecipeSaveRequestDto,
+  RecipeSaveResponseDto,
+  RecipeUnsaveResponseDto,
+  RecipeToggleLikeResponseDto
+} from './dtos/recipe.dto';
 import { UserRecipeRole } from './domain/user-recipe.model';
 import { AuthGuard } from '../auth/auth.guard';
-import { Comment } from './domain/comment.model';
-import { CreateCommentDto } from './dtos/comment.dto';
+import {
+  RecipeAddCommentRequestDto,
+  RecipeAddCommentResponseDto,
+  RecipeGetCommentsResponseDto
+} from './dtos/comment.dto';
 
 import { OptionalAuthGuard } from '../auth/optional-auth.guard';
 
@@ -15,8 +33,9 @@ export class RecipesController {
 
   @Post()
   @UseGuards(AuthGuard)
-  async create(@Body() createRecipeDto: CreateRecipeDto, @Req() req: any): Promise<Recipe> {
-    return this.recipesService.create(createRecipeDto, req.user.sub);
+  async create(@Body() createRecipeDto: RecipeCreateRequestDto, @Req() req: any): Promise<RecipeCreateResponseDto> {
+    const recipe = await this.recipesService.create(createRecipeDto, req.user.sub);
+    return recipe; // The service logic needs to return correctly mapped response if we want strict separation, but returning the mapped domain model that satisfies the interface is accepted in TS. For best practice, we can let TS duck typing handle it or we'd map explicitly. NestJS controllers typically return domain and class-serializer handles it.
   }
 
   @Get()
@@ -25,7 +44,7 @@ export class RecipesController {
     @Query('offset') offset?: number,
     @Query('limit') limit?: number,
     @Req() req?: any
-  ): Promise<Recipe[]> {
+  ): Promise<RecipeGetAllResponseDto[]> {
     return this.recipesService.findAll(offset, limit, req?.user?.sub);
   }
 
@@ -35,38 +54,31 @@ export class RecipesController {
     @Query('category') category?: string,
     @Query('name') name?: string,
     @Req() req?: any
-  ): Promise<Recipe[]> {
+  ): Promise<RecipeSearchResponseDto[]> {
     return this.recipesService.search(name, category, req?.user?.sub);
   }
 
   @Post('search/ingredients')
   @HttpCode(200)
   @UseGuards(OptionalAuthGuard)
-  async searchByIngredients(@Body() ingredients: string[], @Req() req?: any): Promise<Recipe[]> {
-    // searchByIngredients implementation in service doesn't support userId yet?
-    // Let's modify service signature if needed, or update controller to just return results.
-    // Actually, I haven't updated searchByIngredients in service yet.
-    // Let's assume it doesn't support it for now, unless I update it. 
-    // The instructions were for findAll and search. I'll just leave this as is but pass req for now? 
-    // Wait, RecipesService.searchByIngredients signature: (ingredients: string[]) -> Recipe[]
-    // I should update it later if needed. For now just standard call.
-    return this.recipesService.searchByIngredients(ingredients);
+  async searchByIngredients(@Body() body: RecipeSearchByIngredientsRequestDto, @Req() req?: any): Promise<RecipeSearchByIngredientsResponseDto[]> {
+    return this.recipesService.searchByIngredients(body.ingredients);
   }
 
   @Get('user/:userId')
   @UseGuards(OptionalAuthGuard)
-  async findByUser(@Param('userId', ParseIntPipe) userId: number, @Query('role') role: UserRecipeRole, @Req() req?: any): Promise<Recipe[]> {
+  async findByUser(@Param('userId', ParseIntPipe) userId: number, @Query('role') role: UserRecipeRole, @Req() req?: any): Promise<RecipeGetByUserResponseDto[]> {
     return this.recipesService.findByUserAndRole(userId, role, req?.user?.sub);
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Recipe> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<RecipeGetResponseDto> {
     return this.recipesService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AuthGuard)
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateRecipeDto: UpdateRecipeDto, @Req() req: any): Promise<Recipe> {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateRecipeDto: RecipeUpdateRequestDto, @Req() req: any): Promise<RecipeUpdateResponseDto> {
     return this.recipesService.update(id, updateRecipeDto, req.user.sub);
   }
 
@@ -78,7 +90,7 @@ export class RecipesController {
 
   @Post(':id/fork')
   @UseGuards(AuthGuard)
-  async fork(@Param('id', ParseIntPipe) id: number, @Req() req: any): Promise<Recipe> {
+  async fork(@Param('id', ParseIntPipe) id: number, @Req() req: any): Promise<RecipeForkResponseDto> {
     return this.recipesService.fork(id, req.user.sub);
   }
 
@@ -86,10 +98,10 @@ export class RecipesController {
   @UseGuards(AuthGuard)
   async saveRecipe(
     @Param('id', ParseIntPipe) id: number,
-    @Body('collection') collection: string,
+    @Body() body: RecipeSaveRequestDto,
     @Req() req: any
-  ): Promise<Recipe> {
-    return this.recipesService.saveRecipe(id, req.user.sub, collection);
+  ): Promise<RecipeSaveResponseDto> {
+    return this.recipesService.saveRecipe(id, req.user.sub, body.collection);
   }
 
   @Delete(':id/save')
@@ -98,13 +110,13 @@ export class RecipesController {
     @Param('id', ParseIntPipe) id: number,
     @Query('collection') collection: string,
     @Req() req: any
-  ): Promise<Recipe> {
+  ): Promise<RecipeUnsaveResponseDto> {
     return this.recipesService.unsaveRecipe(id, req.user.sub, collection);
   }
 
   @Post(':id/like')
   @UseGuards(AuthGuard)
-  async toggleLike(@Param('id', ParseIntPipe) id: number, @Req() req: any): Promise<{ liked: boolean; likesCount: number }> {
+  async toggleLike(@Param('id', ParseIntPipe) id: number, @Req() req: any): Promise<RecipeToggleLikeResponseDto> {
     return this.recipesService.toggleLike(id, req.user.sub);
   }
 
@@ -112,14 +124,14 @@ export class RecipesController {
   @UseGuards(AuthGuard)
   async addComment(
     @Param('id', ParseIntPipe) id: number,
-    @Body() createCommentDto: CreateCommentDto,
+    @Body() createCommentDto: RecipeAddCommentRequestDto,
     @Req() req: any
-  ): Promise<Comment> {
+  ): Promise<RecipeAddCommentResponseDto> {
     return this.recipesService.addComment(id, req.user.sub, createCommentDto);
   }
 
   @Get(':id/comments')
-  async getComments(@Param('id', ParseIntPipe) id: number): Promise<Comment[]> {
+  async getComments(@Param('id', ParseIntPipe) id: number): Promise<RecipeGetCommentsResponseDto[]> {
     return this.recipesService.getComments(id);
   }
 }

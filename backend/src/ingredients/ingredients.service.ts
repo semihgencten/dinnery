@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { IngredientEntity } from './entities/ingredient.entity';
 import { Ingredient } from './domain/ingredient.model';
 import { IngredientMapper } from './mappers/ingredient.mapper';
-import { CreateIngredientDto } from './dtos/ingredient.dto';
+import { IngredientCreateRequestDto } from './dtos/ingredient.dto';
 
 @Injectable()
 export class IngredientsService {
@@ -26,7 +26,7 @@ export class IngredientsService {
         return IngredientMapper.toDomain(entity, 0);
     }
 
-    async create(createDto: CreateIngredientDto): Promise<Ingredient> {
+    async create(createDto: IngredientCreateRequestDto): Promise<Ingredient> {
         const domainData = Ingredient.create(
             createDto.name,
             createDto.displayName,

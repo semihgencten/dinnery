@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './entities/user.entity';
 import { User } from './domain/user.model';
 import { UserMapper } from './mappers/user.mapper';
-import { CreateUserDto } from './dtos/user.dto';
+import { UserRegisterRequestDto } from './dtos/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -35,7 +35,7 @@ export class UsersService {
         return UserMapper.toDomain(entity);
     }
 
-    async create(createDto: CreateUserDto): Promise<User> {
+    async create(createDto: UserRegisterRequestDto): Promise<User> {
         // Check for existing email
         const existing = await this.userRepo.findOne({
             where: { email: createDto.email }

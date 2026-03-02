@@ -17,17 +17,26 @@ export class RecipesStore {
         makeAutoObservable(this);
     }
 
+    mapRecipe(r: any): Recipe {
+        return {
+            ...r,
+            likesCount: r.likesCount ?? 0,
+            commentsCount: r.commentsCount ?? 0,
+            createdAt: r.createdAt as unknown as string,
+            updatedAt: r.updatedAt as unknown as string
+        };
+    }
+
     async fetchRecipes(offset = 0, limit = 20) {
         this.isLoading = true;
         try {
             const recipes = await getRecipes(offset, limit);
             runInAction(() => {
-                // For now, simpler implementation: replace recipes on load.
-                // If implementing infinite scroll later, we would append.
+                const mapped = recipes.map(r => this.mapRecipe(r));
                 if (offset === 0) {
-                    this.recipes = recipes;
+                    this.recipes = mapped;
                 } else {
-                    this.recipes.push(...recipes);
+                    this.recipes.push(...mapped);
                 }
             });
         } catch (error) {
@@ -44,7 +53,7 @@ export class RecipesStore {
         try {
             const recipes = await searchRecipes(name, category);
             runInAction(() => {
-                this.recipes = recipes;
+                this.recipes = recipes.map(r => this.mapRecipe(r));
             });
         } catch (error) {
             console.error('Failed to search recipes', error);
@@ -62,7 +71,7 @@ export class RecipesStore {
         try {
             const recipe = await getRecipe(id);
             runInAction(() => {
-                this.currentRecipe = recipe;
+                this.currentRecipe = this.mapRecipe(recipe);
             });
             // Fetch comments in parallel or after
             this.fetchComments(id);
@@ -79,7 +88,11 @@ export class RecipesStore {
         try {
             const comments = await getComments(id);
             runInAction(() => {
-                this.currentRecipeComments = comments;
+                this.currentRecipeComments = comments.map(c => ({
+                    ...c,
+                    createdAt: c.createdAt as unknown as string,
+                    updatedAt: c.updatedAt as unknown as string
+                }));
             });
         } catch (error) {
             console.error(`Failed to fetch comments for recipe ${id}`, error);
@@ -91,7 +104,7 @@ export class RecipesStore {
         try {
             const recipes = await getUserRecipes(userId, 'creator');
             runInAction(() => {
-                this.recipes = recipes;
+                this.recipes = recipes.map(r => this.mapRecipe(r));
             });
         } catch (error) {
             console.error('Failed to fetch user recipes', error);
@@ -105,9 +118,9 @@ export class RecipesStore {
     async createRecipe(recipeData: CreateRecipePayload) {
         this.isLoading = true;
         try {
-            const recipe = await createRecipe(recipeData);
+            const recipe = await createRecipe({ ...recipeData, userRecipes: [] });
             runInAction(() => {
-                this.recipes.unshift(recipe);
+                this.recipes.unshift(this.mapRecipe(recipe));
             });
             return recipe;
         } catch (error) {
@@ -134,7 +147,7 @@ export class RecipesStore {
         try {
             const recipes = await searchRecipesByIngredients(ingredients);
             runInAction(() => {
-                this.recipes = recipes;
+                this.recipes = recipes.map(r => this.mapRecipe(r));
             });
             return recipes;
         } catch (error) {
@@ -146,13 +159,13 @@ export class RecipesStore {
             });
         }
     }
-    async fetchSavedRecipes(userId: number, collection?: string) {
+    async fetchSavedRecipes(userId: number) {
         this.isLoading = true;
         try {
             const recipes = await getUserRecipes(userId, 'saved');
             // TODO: Filter by collection if needed, or backend should handle it
             runInAction(() => {
-                this.savedRecipes = recipes;
+                this.savedRecipes = recipes.map(r => this.mapRecipe(r));
             });
         } catch (error) {
             console.error('Failed to fetch saved recipes', error);
@@ -166,19 +179,20 @@ export class RecipesStore {
     async saveRecipe(recipeId: number, collection?: string) {
         try {
             const savedRecipe = await saveRecipe(recipeId, collection);
+            const mappedSaved = this.mapRecipe(savedRecipe);
 
             runInAction(() => {
                 if (!this.savedRecipes.find(r => r.id === savedRecipe.id)) {
-                    this.savedRecipes.push(savedRecipe);
+                    this.savedRecipes.push(mappedSaved);
                 }
 
                 const recipeIndex = this.recipes.findIndex(r => r.id === recipeId);
                 if (recipeIndex !== -1) {
-                    this.recipes[recipeIndex] = savedRecipe;
+                    this.recipes[recipeIndex] = mappedSaved;
                 }
 
                 if (this.currentRecipe && this.currentRecipe.id === recipeId) {
-                    this.currentRecipe = savedRecipe;
+                    this.currentRecipe = mappedSaved;
                 }
             });
         } catch (error) {
@@ -190,17 +204,18 @@ export class RecipesStore {
     async unsaveRecipe(recipeId: number, collection?: string) {
         try {
             const updatedRecipe = await unsaveRecipe(recipeId, collection);
+            const mappedUpdated = this.mapRecipe(updatedRecipe);
 
             runInAction(() => {
                 this.savedRecipes = this.savedRecipes.filter(r => r.id !== recipeId);
 
                 const recipeIndex = this.recipes.findIndex(r => r.id === recipeId);
                 if (recipeIndex !== -1) {
-                    this.recipes[recipeIndex] = updatedRecipe;
+                    this.recipes[recipeIndex] = mappedUpdated;
                 }
 
                 if (this.currentRecipe && this.currentRecipe.id === recipeId) {
-                    this.currentRecipe = updatedRecipe;
+                    this.currentRecipe = mappedUpdated;
                 }
             });
         } catch (error) {

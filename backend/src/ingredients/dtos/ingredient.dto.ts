@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-export class CreateIngredientDto {
+export class IngredientCreateRequestDto {
     @IsString()
     @IsNotEmpty()
     name: string;
@@ -18,7 +18,7 @@ export class CreateIngredientDto {
     category?: string;
 }
 
-export class IngredientResponseDto {
+export class IngredientBaseResponseDto {
     id: number;
     name: string;
     displayName: string;
@@ -26,3 +26,8 @@ export class IngredientResponseDto {
     category: string | null;
     canBeDeleted: boolean;
 }
+
+export class IngredientCreateResponseDto extends IngredientBaseResponseDto { }
+export class IngredientSearchResponseDto extends IngredientBaseResponseDto { }
+export class IngredientGetResponseDto extends IngredientBaseResponseDto { }
+
