@@ -1,9 +1,17 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
+
+const getBaseUrl = () => {
+    if (__DEV__) {
+        return Platform.OS === 'android' ? 'http://10.0.2.2:3000' : 'http://localhost:3000';
+    }
+    return 'https://your-production-url.com';
+};
 
 // Base URL would be adjusted depending on local environment (e.g. 10.0.2.2 for Android Simulator)
 export const axiosClient = axios.create({
-    baseURL: 'http://localhost:3000',
+    baseURL: getBaseUrl(),
     timeout: 5000,
     headers: {
         'Content-Type': 'application/json',

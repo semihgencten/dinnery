@@ -2,11 +2,14 @@ import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, TextInput, ImageBackground, ActivityIndicator } from 'react-native';
 import { styles } from './HomeScreen.styles';
 import { observer } from 'mobx-react-lite';
+import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../../theme/colors';
 import { recipesStore } from '../../stores/recipes.store';
 
 export const HomeScreen: React.FC = observer(() => {
+    const navigation = useNavigation<any>();
+
     useEffect(() => {
         recipesStore.fetchTrendingRecipes();
         recipesStore.fetchRecommendedRecipes();
@@ -79,7 +82,12 @@ export const HomeScreen: React.FC = observer(() => {
                                 <Text style={{ color: theme.colors.textLight, padding: 20 }}>No trending recipes found.</Text>
                             )}
                             {trendingRecipes.map(recipe => (
-                                <TouchableOpacity key={recipe.id} activeOpacity={0.9} style={styles.trendingCard}>
+                                <TouchableOpacity
+                                    key={recipe.id}
+                                    activeOpacity={0.9}
+                                    style={styles.trendingCard}
+                                    onPress={() => navigation.navigate('RecipeDetail', { id: recipe.id })}
+                                >
                                     <ImageBackground
                                         source={getImageUrl(recipe.photoUrl)}
                                         style={styles.trendingImageBg}
@@ -122,7 +130,11 @@ export const HomeScreen: React.FC = observer(() => {
                                 <Text style={{ color: theme.colors.textLight }}>No recommended recipes right now.</Text>
                             )}
                             {recommendedRecipes.map(recipe => (
-                                <TouchableOpacity key={recipe.id} style={styles.recommendedCard}>
+                                <TouchableOpacity
+                                    key={recipe.id}
+                                    style={styles.recommendedCard}
+                                    onPress={() => navigation.navigate('RecipeDetail', { id: recipe.id })}
+                                >
                                     <Image
                                         source={getImageUrl(recipe.photoUrl)}
                                         style={styles.recommendedImage}

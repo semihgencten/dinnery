@@ -1,23 +1,39 @@
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, ImageBackground, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, ImageBackground, ActivityIndicator, Image } from 'react-native';
 import { styles } from './ProfileScreen.styles';
 import { observer } from 'mobx-react-lite';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../../theme/colors';
 import { userStore } from '../../stores/user.store';
-
-const COLLECTIONS = [
-    { title: 'Quick Dinners', count: 24, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuB4VIm6UByl1O2DrFsFBVMdeKpvfXwG7BJKQz5fD7GgypzKuObDeaJMO68Y1amXEuuWDyLZKq0Gc1g_TGGtd_z-LDzCWhItUxdlGwnFcKAtYOp3ciFVekrl9EbUFk7tJClMFVDWBb5cvs917eUUbV9AN8OFSgBYSMvtkWQ-hmDPIINI5EwgXBvMF4iWjCdvrSf9KP_UYpauZ3PqfhL_Hpjy3Rq4mk-rG7LeUvWEnqI6Jbmxij3QPHNXj20sM3LIm1ApYGZglOcRLME' },
-    { title: 'Summer Salads', count: 18, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAxCtMAJBYvEtBGqASIqhQb408YQU84TfD_8Md2kAYE8f3Ghe6o0FwOzSf8Tx0LUqdvFZQxamdHiOSG_biPCdH5dBI21wmI27QVBZ-otFMGobBDo_iwhpl_mvqAAQMDzpFrs5ncJI3qYp38Sx6YiJ4OTXZHQUG-Gneg0BowN5zma72PAcmP34UeccDSOxhg0WnyspYtXreNbGINHqnkEEECund5xL3dUmnAlhL9VxVWnVqqp28nQDpnMYf59kz1QOw1_Xy_SYfeFDU' },
-    { title: 'Baking', count: 12, img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCodSzaB4mJWdwBCDfpCq_L2VlHSALVnq18P-h0HEhgbODngaacBsV3EjPWxrQ66BFdSOYD8H1fu0LYUx-ejT8Pu8hoH_g3i_xbVMVA28D_ifaMNuCsfYB_noPqU45cwzWadmszmRQXudk_2knWOnKXqy0K5HFtcxyYRkIsN2KBfAcidQJ1yeRgjqUgLiVJKMoPLkMI62o65RbByOssrQ6fTMl2QOecBXA10GgiHAxiNmIzns_h8ylLLm-v3mQK7_s54iSYiPOJVj8' },
-];
+import { recipesStore } from '../../stores/recipes.store';
+import { useNavigation } from '@react-navigation/native';
 
 export const ProfileScreen: React.FC = observer(() => {
+    const navigation = useNavigation<any>();
+    const [activeTab, setActiveTab] = useState<'my_recipes' | 'saved_recipes'>('my_recipes');
+
     useEffect(() => {
-        userStore.fetchProfile();
+        const load = async () => {
+            await userStore.fetchProfile();
+            if (userStore.profile?.id) {
+                recipesStore.fetchUserRecipes(userStore.profile.id);
+                recipesStore.fetchSavedRecipes(userStore.profile.id);
+            }
+        };
+        load();
     }, []);
 
-    const { profile, isLoading } = userStore;
+    const { profile, isLoading: isProfileLoading } = userStore;
+    const { userRecipes, savedRecipes, isLoadingUserRecipes, isLoadingSavedRecipes } = recipesStore;
+
+    const getImageUrl = (url?: string | null) => {
+        return url && url.trim() !== ''
+            ? { uri: url }
+            : { uri: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60' };
+    };
+
+    const isLoadingRecipes = activeTab === 'my_recipes' ? isLoadingUserRecipes : isLoadingSavedRecipes;
+    const displayedRecipes = activeTab === 'my_recipes' ? userRecipes : savedRecipes;
 
     return (
         <View style={styles.container}>
@@ -29,7 +45,7 @@ export const ProfileScreen: React.FC = observer(() => {
                     </TouchableOpacity>
                 </View>
 
-                {isLoading ? (
+                {isProfileLoading ? (
                     <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginTop: 40 }} />
                 ) : (
                     <View style={styles.profileInfo}>
@@ -46,16 +62,16 @@ export const ProfileScreen: React.FC = observer(() => {
                             </View>
                         </View>
 
-                        <Text style={styles.name}>{profile?.email || 'Chef'}</Text>
-                        <Text style={styles.bio}>Language: {profile?.language || 'EN'}</Text>
+                        <Text style={styles.name}>{profile?.email ? profile.email.split('@')[0] : 'Chef'}</Text>
+                        <Text style={styles.bio}>{profile?.email || 'Language: EN'}</Text>
 
                         <View style={styles.statsContainer}>
                             <View style={styles.statBox}>
-                                <Text style={styles.statValue}>12</Text>
+                                <Text style={styles.statValue}>{userRecipes.length}</Text>
                                 <Text style={styles.statLabel}>CREATED</Text>
                             </View>
                             <View style={styles.statBox}>
-                                <Text style={styles.statValue}>84</Text>
+                                <Text style={styles.statValue}>{savedRecipes.length}</Text>
                                 <Text style={styles.statLabel}>SAVED</Text>
                             </View>
                         </View>
@@ -66,44 +82,64 @@ export const ProfileScreen: React.FC = observer(() => {
             <ScrollView contentContainerStyle={styles.content}>
                 {/* Tabs */}
                 <View style={styles.tabsWrapper}>
-                    <TouchableOpacity style={styles.tabInactive}>
-                        <Text style={styles.tabTextInactive}>My Recipes</Text>
+                    <TouchableOpacity
+                        style={activeTab === 'my_recipes' ? styles.tabActive : styles.tabInactive}
+                        onPress={() => setActiveTab('my_recipes')}
+                    >
+                        <Text style={activeTab === 'my_recipes' ? styles.tabTextActive : styles.tabTextInactive}>
+                            My Recipes
+                        </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.tabActive}>
-                        <Text style={styles.tabTextActive}>Saved Recipes</Text>
+                    <TouchableOpacity
+                        style={activeTab === 'saved_recipes' ? styles.tabActive : styles.tabInactive}
+                        onPress={() => setActiveTab('saved_recipes')}
+                    >
+                        <Text style={activeTab === 'saved_recipes' ? styles.tabTextActive : styles.tabTextInactive}>
+                            Saved Recipes
+                        </Text>
                     </TouchableOpacity>
                 </View>
 
-                {/* Collections */}
-                <View style={styles.collectionsHeader}>
-                    <Text style={styles.collectionsTitle}>Collections</Text>
-                    <TouchableOpacity style={styles.addCollectionBtn}>
-                        <MaterialIcons name="add" size={16} color={theme.colors.primary} />
-                        <Text style={styles.addCollectionText}>New</Text>
-                    </TouchableOpacity>
-                </View>
+                {/* Recipes List */}
+                <View>
+                    {isLoadingRecipes ? (
+                        <ActivityIndicator size="large" color={theme.colors.primary} style={{ marginTop: 20 }} />
+                    ) : (
+                        <>
+                            {displayedRecipes.length === 0 && (
+                                <Text style={styles.emptyStateText}>
+                                    {activeTab === 'my_recipes'
+                                        ? "You haven't created any recipes yet."
+                                        : "You haven't saved any recipes yet."}
+                                </Text>
+                            )}
 
-                <View style={styles.grid}>
-                    {COLLECTIONS.map((c, i) => (
-                        <TouchableOpacity key={i} style={styles.collectionCard}>
-                            <View style={styles.collectionImgWrapper}>
-                                <ImageBackground source={{ uri: c.img }} style={styles.collectionImg}>
-                                    <View style={styles.collectionOverlay}>
-                                        <View style={styles.collectionBadge}>
-                                            <Text style={styles.collectionBadgeText}>{c.count} ITEMS</Text>
+                            {displayedRecipes.map((recipe) => (
+                                <TouchableOpacity
+                                    key={recipe.id}
+                                    style={styles.recipeCard}
+                                    onPress={() => navigation.navigate('RecipeDetail', { id: recipe.id })}
+                                >
+                                    <Image
+                                        source={getImageUrl(recipe.photoUrl)}
+                                        style={styles.recipeImage}
+                                    />
+                                    <View style={styles.recipeContent}>
+                                        <Text style={styles.recipeTitle}>{recipe.name}</Text>
+                                        <Text style={styles.recipeSubtitle}>
+                                            {recipe.author?.username || 'Chef'} • {recipe.cookTime || recipe.prepTime || 20} mins
+                                        </Text>
+                                        <View style={styles.recipeFooter}>
+                                            <View style={styles.ratingRow}>
+                                                <MaterialIcons name="favorite" size={16} color={theme.colors.primary} />
+                                                <Text style={styles.ratingText}>{recipe.likesCount || 0}</Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </ImageBackground>
-                            </View>
-                            <Text style={styles.collectionTitle}>{c.title}</Text>
-                        </TouchableOpacity>
-                    ))}
-
-                    {/* Create Collection Placeholder */}
-                    <TouchableOpacity style={styles.createCollectionCard}>
-                        <MaterialIcons name="create-new-folder" size={32} color={theme.colors.primary} />
-                        <Text style={styles.createCollectionText}>Create Collection</Text>
-                    </TouchableOpacity>
+                                </TouchableOpacity>
+                            ))}
+                        </>
+                    )}
                 </View>
             </ScrollView>
         </View>

@@ -1,15 +1,60 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ImageBackground, ActivityIndicator } from 'react-native';
 import { styles } from './CreateScreen.styles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { theme } from '../../theme/colors';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { Image } from 'react-native-compressor';
+import { getCloudinarySignature, uploadPhotoToCloudinary } from '../../api/photoClient';
 
 export const CreateScreen: React.FC = () => {
     const [ingredients, setIngredients] = useState(['']);
     const [instructions, setInstructions] = useState(['']);
+    const [photoUri, setPhotoUri] = useState<string | null>(null);
+    const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
+    const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
 
     const addIngredient = () => setIngredients([...ingredients, '']);
     const addInstruction = () => setInstructions([...instructions, '']);
+
+    const handleCoverPhotoPick = async () => {
+        const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
+        if (result.didCancel || !result.assets || result.assets.length === 0) return;
+
+        const asset = result.assets[0];
+        let uri = asset.uri;
+        let fileSize = asset.fileSize;
+        const fileName = asset.fileName || 'photo.jpg';
+        const type = asset.type || 'image/jpeg';
+
+        if (!uri) return;
+
+        setIsUploadingPhoto(true);
+
+        try {
+            // 5MB Limit Check
+            const MAX_SIZE = 5 * 1024 * 1024;
+            if (fileSize && fileSize > MAX_SIZE) {
+                console.log('Image exceeds 5MB, compressing...', fileSize);
+                uri = await Image.compress(uri, {
+                    compressionMethod: 'auto',
+                    quality: 0.8,
+                });
+                console.log('Compressed URI:', uri);
+            }
+
+            setPhotoUri(uri);
+
+            // Upload to Cloudinary
+            const signatureData = await getCloudinarySignature();
+            const secureUrl = await uploadPhotoToCloudinary(uri, fileName, type, signatureData);
+            setUploadedPhotoUrl(secureUrl);
+        } catch (err) {
+            console.error('Error handling cover photo:', err);
+        } finally {
+            setIsUploadingPhoto(false);
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -25,16 +70,24 @@ export const CreateScreen: React.FC = () => {
             <ScrollView contentContainerStyle={styles.content}>
                 {/* Cover Photo Upload */}
                 <View style={styles.photoContainer}>
-                    <ImageBackground
-                        source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA0i91TZXWilG_iGdss740IzWtSPDezv9fywXU03lD2QSLlbTpZMUviPNmXgE5dDbSw8cDzbPCmUClZFyZRhTCBqaMREFnmEvQmEd8JCJQQVyH612ui16wbdEClJXrko9oQ1Hgg6F-PWHAAImeaQJN0_yMMKXgmiWzYnU1K4iYJE8WVtR9wg2ZE6UICZeF0kNBlANKzWqrssEOjNf0ny8i6Ie0xpYjP3FhDphp3bbRdd0cPmYV1QNAmpVSX_1dqpZCVgwEcrC9xm68' }}
-                        style={styles.photoUpload}
-                        imageStyle={{ borderRadius: 12 }}
-                    >
-                        <View style={styles.photoOverlay}>
-                            <MaterialIcons name="add-a-photo" size={32} color={theme.colors.white} />
-                            <Text style={styles.photoText}>ADD COVER PHOTO</Text>
-                        </View>
-                    </ImageBackground>
+                    <TouchableOpacity onPress={handleCoverPhotoPick} disabled={isUploadingPhoto} activeOpacity={0.8}>
+                        <ImageBackground
+                            source={{ uri: photoUri || 'https://lh3.googleusercontent.com/aida-public/AB6AXuA0i91TZXWilG_iGdss740IzWtSPDezv9fywXU03lD2QSLlbTpZMUviPNmXgE5dDbSw8cDzbPCmUClZFyZRhTCBqaMREFnmEvQmEd8JCJQQVyH612ui16wbdEClJXrko9oQ1Hgg6F-PWHAAImeaQJN0_yMMKXgmiWzYnU1K4iYJE8WVtR9wg2ZE6UICZeF0kNBlANKzWqrssEOjNf0ny8i6Ie0xpYjP3FhDphp3bbRdd0cPmYV1QNAmpVSX_1dqpZCVgwEcrC9xm68' }}
+                            style={styles.photoUpload}
+                            imageStyle={{ borderRadius: 12 }}
+                        >
+                            <View style={styles.photoOverlay}>
+                                {isUploadingPhoto ? (
+                                    <ActivityIndicator size="large" color={theme.colors.white} />
+                                ) : (
+                                    <MaterialIcons name={photoUri ? "edit" : "add-a-photo"} size={32} color={theme.colors.white} />
+                                )}
+                                <Text style={styles.photoText}>
+                                    {isUploadingPhoto ? 'UPLOADING...' : (photoUri ? 'CHANGE COVER PHOTO' : 'ADD COVER PHOTO')}
+                                </Text>
+                            </View>
+                        </ImageBackground>
+                    </TouchableOpacity>
                 </View>
 
                 {/* Basic Info */}
